@@ -17,6 +17,7 @@ class base(object):
         options.headless = True
         self.driver = webdriver.Chrome(options=options)
         self.timeout = timeout
+        self.driver.implicitly_wait(10)
 
     def create_folder(self, folder_name):
         cur_dir = os.path.abspath(os.getcwd())
@@ -35,7 +36,6 @@ class base(object):
 
     def open_chrome_in_headless_mode(self, url):
         self.driver.get(url)
-        self.driver.implicitly_wait(20)
 
     def get_current_url(self):
         url = self.driver.current_url
