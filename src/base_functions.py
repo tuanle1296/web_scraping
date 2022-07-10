@@ -1,5 +1,6 @@
 import pathlib
 import docx
+import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -11,13 +12,13 @@ import os
 
 class base(object):
 
-    def __init__(self, timeout=5):
-        self.path = None
+    def __init__(self, is_headless_mode=True, timeout=10):
         options = webdriver.ChromeOptions()
-        options.headless = True
+        options.headless = is_headless_mode
         self.driver = webdriver.Chrome(options=options)
+        self.path = None
         self.timeout = timeout
-        self.driver.implicitly_wait(10)
+        self.driver.implicitly_wait(self.timeout)
 
     def create_folder(self, folder_name):
         cur_dir = os.path.abspath(os.getcwd())
@@ -25,16 +26,34 @@ class base(object):
         self.path = os.path.join(cur_dir, dir_name)
         pathlib.Path(self.path).mkdir(parents=True, exist_ok=True)
 
+    def maximize_browser(self):
+        self.driver.maximize_window()
+
     def capture_screen(self, name):
         s = lambda x: self.driver.execute_script('return document.body.parentNode.scroll' + x)
         self.driver.set_window_size(s('Width'), s('Height'))  # May need manual adjustment
         self.driver.find_element(By.TAG_NAME, 'body').screenshot(name)
 
+    def scroll_web_page_to_the_end(self):
+        pause_time = 0.5
+        # Get scroll height
+        last_height = self.driver.execute_script("return document.body.scrollHeight")
+        while True:
+            # Scroll down to bottom
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            # Wait to load page
+            time.sleep(pause_time)
+            # Calculate new scroll height and compare with last scroll height
+            new_height = self.driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+            last_height = new_height
+
     def define_img_name(self, title):
         file_name = os.path.join(self.path, title + ".png")
         return file_name
 
-    def open_chrome_in_headless_mode(self, url):
+    def go_to_webpage(self, url):
         self.driver.get(url)
 
     def get_current_url(self):
@@ -45,9 +64,23 @@ class base(object):
         WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).click()
 
     def reload_current_page(self):
-        self.driver.get(self.driver.current_url)
+        self.driver.refresh()
 
-    def wait_until_page_contains(self, element):
+    def open_new_tab(self, url, tab_number=1):
+        self.driver.execute_script('''window.open('about:blank', ''' +
+                                   str(tab_number) + ''');''')
+        self.driver.switch_to.window(str(tab_number))
+        self.driver.get(url)
+
+    def count_number_of_tabs(self):
+        length = len(self.driver.window_handles)
+        return length
+
+    def switch_tab(self, tab_number):
+        self.driver.switch_to.window(self.driver.window_handles[tab_number])
+
+    def wait_until_page_contains(self, element, timeout=5):
+        self.timeout = timeout
         WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element))
 
     def get_attribute_from_tag(self, element, tag):

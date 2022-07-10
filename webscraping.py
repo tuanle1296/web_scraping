@@ -23,21 +23,24 @@ from src.locators import *
 #         process.join()
 
 '''==========================='''
-chap_url = "https://xiaoyang0811.wordpress.com/2019/06/09/chuong-67/"
+chap_url = "https://xiaoyang0811.wordpress.com/2019/04/26/chuong-1/"
 
 
-def main():
+def main(folder_name):
     global chap_url
     print("=======Create folder=======")
     crawl = base()
     xiao_locators = xiao_link()
-    crawl.create_folder("Quan nhan trong khoi lua")
-    print("=======Created folder successfully======")
+    try:
+        crawl.create_folder(folder_name)
+        print("=======Created folder successfully======")
+    except Exception as e:
+        print(e)
     print("=======Start crawling=======")
     flag = "false"
-    new_title = "test"
+    i = 0
     while flag == "false":
-        crawl.open_chrome_in_headless_mode(chap_url)
+        crawl.go_to_webpage(chap_url)
         url = crawl.get_current_url()
         soup = crawl.crawl_data(url)
         chap_title = crawl.get_title_by_class(soup, xiao_locators.cur_title)
@@ -50,8 +53,6 @@ def main():
             crawl.capture_screen(img_name)
         except:
             crawl.save_doc(chap_title, chap_content)
-        if new_title == chap_title.text:
-            flag = "true"
         print(str(chap_title.text))
         try:
             chap_url = crawl.get_attribute_from_tag(xiao_link.next_btn, 'href')
@@ -62,5 +63,10 @@ def main():
     print("=======FINISHED=======")
 
 
-if __name__ == main():
-    main()
+if __name__ == '__main__':
+    f = base()
+    try:
+        main(folder_name="Quan nhan")
+    except KeyboardInterrupt:
+        f.quit_driver()
+        print("=======FINISHED=======")
