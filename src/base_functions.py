@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import requests
+from selenium.webdriver.common.keys import Keys
 import os
 
 
@@ -14,6 +15,7 @@ class base(object):
 
     def __init__(self, is_headless_mode=True, timeout=10):
         options = webdriver.ChromeOptions()
+        options.add_argument("--disable-notifications")
         options.headless = is_headless_mode
         self.driver = webdriver.Chrome(options=options)
         self.path = None
@@ -65,6 +67,21 @@ class base(object):
 
     def reload_current_page(self):
         self.driver.refresh()
+
+    def get_page_source(self):
+        source = self.driver.page_source
+        return source
+
+    def pass_data_to_file(self, source, file_name):
+        f = open(file_name + ".html", "w")
+        f.write(source)
+        f.close()
+
+    def press_Enter(self, element):
+        WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).send_keys(Keys.ENTER)
+
+    def input_text(self, element, text):
+        WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).send_keys(text)
 
     def open_new_tab(self, url, tab_number=1):
         self.driver.execute_script('''window.open('about:blank', ''' +
