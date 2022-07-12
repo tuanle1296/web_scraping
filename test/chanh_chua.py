@@ -135,3 +135,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         f.quit_driver()
         print("=======ENDED BY INTERRUPTING=======")
+
+'''Note: run this code using cmd: python3 -m test.chanh_chua'''

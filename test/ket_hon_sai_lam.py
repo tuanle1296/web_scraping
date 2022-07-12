@@ -116,6 +116,7 @@ def crawl_ngoai_truyen_1(folder_name, password):
         crawl_3.save_doc(chap_title, chap_content)
     print("===========FINISHED ngoai truyen 1=============")
     crawl_3.quit_driver()
+    crawl_3.remove_file_if_exists("testdata.html")
 
 
 def crawl_ngoai_truyen_2(folder_name, password):
@@ -142,6 +143,7 @@ def crawl_ngoai_truyen_2(folder_name, password):
         crawl_4.save_doc(chap_title, chap_content)
     print("===========FINISHED ngoai truyen 2==========")
     crawl_4.quit_driver()
+    crawl_4.remove_file_if_exists("testdata2.html")
 
 
 def crawl_ngoai_truyen_3(folder_name, password):
@@ -168,6 +170,7 @@ def crawl_ngoai_truyen_3(folder_name, password):
         crawl_5.save_doc(chap_title, chap_content)
     print("========FINISHED ngoai truyen 3==========")
     crawl_5.quit_driver()
+    crawl_5.remove_file_if_exists("testdata3.html")
 
 
 if __name__ == '__main__':
@@ -188,3 +191,5 @@ if __name__ == '__main__':
     process_4.join()
     process_5.join()
     sys.exit()
+
+'''Note: run this code using cmd: python3 -m test.ket_hon_sai_lam'''
