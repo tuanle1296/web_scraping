@@ -51,6 +51,14 @@ class base(object):
                 break
             last_height = new_height
 
+    @staticmethod
+    def remove_file_if_exists(file):
+        try:
+            os.path.exists(file)
+            os.remove(file)
+        except:
+            pass
+
     def define_img_name(self, title):
         file_name = os.path.join(self.path, title + ".png")
         return file_name
@@ -123,9 +131,14 @@ class base(object):
 
     def save_doc(self, title, body):
         document = docx.Document()
-        document.add_heading(title.get_text())
-        document.add_paragraph(body.get_text(separator='\n', strip=True))
-        document.save(os.path.join(self.path, str(title.get_text()) + ".docx"))
+        try:
+            document.add_heading(title.get_text())
+            document.add_paragraph(body.get_text(separator='\n', strip=True))
+            document.save(os.path.join(self.path, str(title.get_text()) + ".docx"))
+        except:
+            document.add_heading(title.text)
+            document.add_paragraph(body.get_text(separator='\n', strip=True))
+            document.save(os.path.join(self.path, str(title.text) + ".docx"))
 
     @staticmethod
     def get_title_by_class(soup, title_element):

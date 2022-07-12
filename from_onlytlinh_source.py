@@ -1,6 +1,5 @@
-import threading
 from src.base_functions import *
-from src.locators import *
+from src.locators import onlytlinh
 
 '''============Multi thread=========='''
 # def crawl_data(folder_name):
