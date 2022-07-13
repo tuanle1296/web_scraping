@@ -58,9 +58,9 @@ def crawl_from_chap_1_to_31(folder_name):
         print("url from chap: " + str(chap_title.text) + str(url))
         crawl_1.click_element(locators_1.next_from_1_to_31)
         time.sleep(1)
-
-    crawl_1.quit_driver()
     print("======FINISHED from chap 1 to 31=======")
+    crawl_1.quit_driver()
+    
 
 
 def crawl_from_chap_32_to_57(folder_name):
@@ -87,9 +87,9 @@ def crawl_from_chap_32_to_57(folder_name):
         print("url from chap: " + str(chap_title.text) + str(url))
         crawl_2.click_element(locators_2.next_from_32_to_57)
         time.sleep(1)
-
-    crawl_2.quit_driver()
     print("======FINISHED from chap 32 to 57=======")
+    crawl_2.quit_driver()
+    
 
 
 def crawl_ngoai_truyen_1(folder_name, password):
@@ -115,8 +115,9 @@ def crawl_ngoai_truyen_1(folder_name, password):
         chap_content = crawl_3.get_body_by_class(beautifulSoupText, locators_3.content_from_chap_32_to_57)
         crawl_3.save_doc(chap_title, chap_content)
     print("===========FINISHED ngoai truyen 1=============")
-    crawl_3.quit_driver()
     crawl_3.remove_file_if_exists("testdata.html")
+    crawl_3.quit_driver()
+    
 
 
 def crawl_ngoai_truyen_2(folder_name, password):
@@ -142,8 +143,9 @@ def crawl_ngoai_truyen_2(folder_name, password):
         chap_content = crawl_4.get_body_by_class(beautifulSoupText, locators_4.content_from_chap_32_to_57)
         crawl_4.save_doc(chap_title, chap_content)
     print("===========FINISHED ngoai truyen 2==========")
-    crawl_4.quit_driver()
     crawl_4.remove_file_if_exists("testdata2.html")
+    crawl_4.quit_driver()
+    
 
 
 def crawl_ngoai_truyen_3(folder_name, password):
@@ -169,9 +171,9 @@ def crawl_ngoai_truyen_3(folder_name, password):
         chap_content = crawl_5.get_body_by_class(beautifulSoupText, locators_5.content_from_chap_32_to_57)
         crawl_5.save_doc(chap_title, chap_content)
     print("========FINISHED ngoai truyen 3==========")
-    crawl_5.quit_driver()
     crawl_5.remove_file_if_exists("testdata3.html")
-
+    crawl_5.quit_driver()
+    
 
 if __name__ == '__main__':
     v = kethonsailam()
