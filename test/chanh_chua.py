@@ -1,6 +1,5 @@
-import threading
 from src.base_functions import *
-from src.locators import *
+from src.locators import onlytlinh
 
 '''============Multi thread=========='''
 # def crawl_data(folder_name):
@@ -125,14 +124,16 @@ def main(folder_name):
             crawl.switch_tab(1)
         except:
             flag = "true"
-    crawl.quit_driver()
     print("=======FINISHED=======")
-
+    crawl.quit_driver()
+    
 
 if __name__ == '__main__':
     f = base()
     try:
         main(folder_name="Chanh chua")
     except KeyboardInterrupt:
-        f.quit_driver()
         print("=======ENDED BY INTERRUPTING=======")
+        f.quit_driver()
+
+'''Note: run this code using cmd: python3 -m test.chanh_chua'''

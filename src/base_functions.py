@@ -31,6 +31,17 @@ class base(object):
     def maximize_browser(self):
         self.driver.maximize_window()
 
+    def verify_element(self, element, timeOut=5):
+        try:
+            WebDriverWait(self.driver, timeOut).until(EC.visibility_of_element_located(element))
+        except:
+            return False
+        return True
+
+    def count_elements(self, element):
+        length = WebDriverWait(self.driver, self.timeout).until(EC.presence_of_all_elements_located(element))
+        return len(length)
+
     def capture_screen(self, name):
         s = lambda x: self.driver.execute_script('return document.body.parentNode.scroll' + x)
         self.driver.set_window_size(s('Width'), s('Height'))  # May need manual adjustment
@@ -50,6 +61,14 @@ class base(object):
             if new_height == last_height:
                 break
             last_height = new_height
+
+    @staticmethod
+    def remove_file_if_exists(file):
+        try:
+            os.path.exists(file)
+            os.remove(file)
+        except:
+            pass
 
     def define_img_name(self, title):
         file_name = os.path.join(self.path, title + ".png")
@@ -100,10 +119,12 @@ class base(object):
         self.timeout = timeout
         WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element))
 
-    def get_attribute_from_tag(self, element, tag):
-        attribute = WebDriverWait(self.driver, self.timeout).until(EC.visibility_of_element_located(element)
-                                                                   ).get_attribute(tag)
-        return attribute
+    def get_attribute_from_all_elements(self, element, tag):
+        list = []
+        list_of_elements = WebDriverWait(self.driver, self.timeout).until(EC.visibility_of_all_elements_located(element))
+        for i in list_of_elements:
+            list.append(i.get_attribute(tag))
+        return list
 
     @staticmethod
     def replace_text(base_string, text_be_replaced, text_to_replace):
@@ -123,9 +144,14 @@ class base(object):
 
     def save_doc(self, title, body):
         document = docx.Document()
-        document.add_heading(title.get_text())
-        document.add_paragraph(body.get_text(separator='\n', strip=True))
-        document.save(os.path.join(self.path, str(title.get_text()) + ".docx"))
+        try:
+            document.add_heading(title.get_text())
+            document.add_paragraph(body.get_text(separator='\n', strip=True))
+            document.save(os.path.join(self.path, str(title.get_text()) + ".docx"))
+        except:
+            document.add_heading(title.text)
+            document.add_paragraph(body.get_text(separator='\n', strip=True))
+            document.save(os.path.join(self.path, str(title.text) + ".docx"))
 
     @staticmethod
     def get_title_by_class(soup, title_element):
