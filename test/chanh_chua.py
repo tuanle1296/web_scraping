@@ -81,7 +81,7 @@ def main(folder_name):
 
             if 21 <= i <= 25 or 37 <= i <= 85:
                 page = crawl.get_page_source()
-                crawl.pass_data_to_file(page, "testdata")
+                crawl.pass_data_to_file(page, "testdata.html")
                 with open("testdata.html", 'r') as file:
                     beautifulSoupText = BeautifulSoup(file.read(), 'html.parser')
                     chap_title = crawl.get_title_by_class(beautifulSoupText, locators.cur_title)

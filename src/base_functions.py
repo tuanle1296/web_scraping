@@ -92,9 +92,11 @@ class base(object):
         return source
 
     def pass_data_to_file(self, source, file_name):
-        f = open(file_name + ".html", "w")
-        f.write(source)
-        f.close()
+        try:
+            f = open(file_name, "w")
+            f.write(source)
+        finally:
+            f.close()
 
     def press_Enter(self, element):
         WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).send_keys(Keys.ENTER)
