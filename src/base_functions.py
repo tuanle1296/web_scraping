@@ -13,7 +13,7 @@ import os
 
 class base(object):
 
-    def __init__(self, is_headless_mode=True, timeout=10):
+    def __init__(self, is_headless_mode=True, timeout=15):
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-notifications")
         options.headless = is_headless_mode
@@ -118,8 +118,11 @@ class base(object):
         self.driver.switch_to.window(self.driver.window_handles[tab_number])
 
     def wait_until_page_contains(self, element, timeout=5):
-        self.timeout = timeout
-        WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element))
+        try:
+            WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable(element))
+        except:
+            return False
+        return True
 
     def get_attribute_from_all_elements(self, element, tag):
         list = []
