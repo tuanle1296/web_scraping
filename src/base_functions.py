@@ -131,6 +131,10 @@ class base(object):
             list.append(i.get_attribute(tag))
         return list
 
+    def get_attribute_from_element(self, element, tag):
+        e = WebDriverWait(self.driver, self.timeout).until(EC.visibility_of_element_located(element)).get_attribute(tag)
+        return e
+
     @staticmethod
     def replace_text(base_string, text_be_replaced, text_to_replace):
         new_string = str(base_string).replace(text_be_replaced, text_to_replace)
