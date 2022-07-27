@@ -28,7 +28,7 @@ def crawl_truyen(folder_name):
                 crawl.click_element(locators.submit_pass_btn)
                 time.sleep(2)
         page = crawl.get_page_source()
-        crawl.pass_data_to_file(page, "datafile")
+        crawl.pass_data_to_file(page, "datafile.html")
         with open("datafile.html", 'r') as file:
             beautifulSoupText = BeautifulSoup(file.read(), 'html.parser')
             chap_title = crawl.get_title_by_class(beautifulSoupText, locators.chap_title)

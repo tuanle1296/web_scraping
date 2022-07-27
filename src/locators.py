@@ -43,3 +43,24 @@ class kcnna:
     # password_3 = "16082008"
     chap_locators = (By.XPATH, "//div[@class='entry-content']//a[contains(text(), 'Chương ')]")
 
+class nguoi_den_tu_bong_toi_tang_gioi:
+    chap_url_list = (By.XPATH, "//div[@class='post-content clear']//p//a[@target='_blank']")
+    cur_title = "post-title entry-title"
+    cur_content = "post-content clear"
+    accept_cookies_btn = (By.XPATH, "//input[@value='Đồng ý']")
+    is_content_img = (By.XPATH, "//div[@class='post-content clear']//img")
+
+class chi_yeu_minh_anh:
+    title = "entry-title"
+    content = "entry-content"
+    is_content_img = (By.XPATH, "//div[@class='entry-content']//img")
+    chap_gioi_thieu = (By.XPATH, "//div[@class='entry-content']//p[@align='center'][6]//a")
+    chap_1_2 = (By.XPATH, "//div[@class='entry-content']//p[@align='center'][7]//a[contains(text(), 'Chương')]")
+    chap_3_to_6 = (By.XPATH, "//div[@class='entry-content']//p[@align='center'][8]//a[contains(text(), 'Chương')]")
+    chap_7_to_11 = (By.XPATH, "//div[@class='entry-content']//p[@align='center'][9]//a[contains(text(), 'Chương')]")
+    chap_12_to_14 = (By.XPATH, "//div[@class='entry-content']//p[@align='center'][10]//a[contains(text(), 'Chương')]")
+    chap_15_16 = (By.XPATH, "//div[@class='entry-content']//p[@align='center'][11]//a[contains(text(), 'Chương')]")
+    chap_17_18 = (By.XPATH, "//div[@class='entry-content']//p[@align='center'][12]//a[contains(text(), 'Chương')]")
+    chap_19_to_63 = "//div[@class='entry-content']//p//a[contains(text(), 'Chương INPUT')]"
+    chap_ = "//div[@class='entry-content']//p//span[contains(text(), 'Chương INPUT')]/../../a"
+

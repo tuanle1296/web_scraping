@@ -108,7 +108,7 @@ def crawl_ngoai_truyen_1(folder_name, password):
     crawl_3.click_element(locators_3.submit_password_btn)
     time.sleep(5)
     page = crawl_3.get_page_source()
-    crawl_3.pass_data_to_file(page, "testdata")
+    crawl_3.pass_data_to_file(page, "testdata.html")
     with open("testdata.html", 'r') as file:
         beautifulSoupText = BeautifulSoup(file.read(), 'html.parser')
         chap_title = crawl_3.get_title_by_class(beautifulSoupText, locators_3.title_from_chap_32_to_57)
@@ -136,7 +136,7 @@ def crawl_ngoai_truyen_2(folder_name, password):
     crawl_4.click_element(locators_4.submit_password_btn)
     time.sleep(5)
     page = crawl_4.get_page_source()
-    crawl_4.pass_data_to_file(page, "testdata2")
+    crawl_4.pass_data_to_file(page, "testdata2.html")
     with open("testdata2.html", 'r') as file:
         beautifulSoupText = BeautifulSoup(file.read(), 'html.parser')
         chap_title = crawl_4.get_title_by_class(beautifulSoupText, locators_4.title_from_chap_32_to_57)
@@ -164,7 +164,7 @@ def crawl_ngoai_truyen_3(folder_name, password):
     crawl_5.click_element(locators_5.submit_password_btn)
     time.sleep(5)
     page = crawl_5.get_page_source()
-    crawl_5.pass_data_to_file(page, "testdata3")
+    crawl_5.pass_data_to_file(page, "testdata3.html")
     with open("testdata3.html", 'r') as file:
         beautifulSoupText = BeautifulSoup(file.read(), 'html.parser')
         chap_title = crawl_5.get_title_by_class(beautifulSoupText, locators_5.title_from_chap_32_to_57)

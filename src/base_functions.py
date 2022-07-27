@@ -13,7 +13,7 @@ import os
 
 class base(object):
 
-    def __init__(self, is_headless_mode=True, timeout=10):
+    def __init__(self, is_headless_mode=True, timeout=15):
         options = webdriver.ChromeOptions()
         options.add_argument("--disable-notifications")
         options.headless = is_headless_mode
@@ -92,9 +92,11 @@ class base(object):
         return source
 
     def pass_data_to_file(self, source, file_name):
-        f = open(file_name + ".html", "w")
-        f.write(source)
-        f.close()
+        try:
+            f = open(file_name, "w")
+            f.write(source)
+        finally:
+            f.close()
 
     def press_Enter(self, element):
         WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).send_keys(Keys.ENTER)
@@ -116,8 +118,11 @@ class base(object):
         self.driver.switch_to.window(self.driver.window_handles[tab_number])
 
     def wait_until_page_contains(self, element, timeout=5):
-        self.timeout = timeout
-        WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element))
+        try:
+            WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable(element))
+        except:
+            return False
+        return True
 
     def get_attribute_from_all_elements(self, element, tag):
         list = []
@@ -125,6 +130,10 @@ class base(object):
         for i in list_of_elements:
             list.append(i.get_attribute(tag))
         return list
+
+    def get_attribute_from_element(self, element, tag):
+        e = WebDriverWait(self.driver, self.timeout).until(EC.visibility_of_element_located(element)).get_attribute(tag)
+        return e
 
     @staticmethod
     def replace_text(base_string, text_be_replaced, text_to_replace):
