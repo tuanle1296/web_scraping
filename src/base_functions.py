@@ -15,7 +15,7 @@ class base(object):
 
     def __init__(self, is_headless_mode=True, timeout=15):
         options = webdriver.ChromeOptions()
-        options.add_argument("--disable-notifications")
+        options.add_argument('--deny-permission-prompts')
         options.headless = is_headless_mode
         self.driver = webdriver.Chrome(options=options)
         self.path = None
@@ -46,6 +46,12 @@ class base(object):
         s = lambda x: self.driver.execute_script('return document.body.parentNode.scroll' + x)
         self.driver.set_window_size(s('Width'), s('Height'))  # May need manual adjustment
         self.driver.find_element(By.TAG_NAME, 'body').screenshot(name)
+
+    def switch_frame(self):
+        self.switch_frame()
+
+    def switch_back_to_default(self):
+        self.switch_back_to_default()
 
     def scroll_web_page_to_the_end(self):
         pause_time = 0.5

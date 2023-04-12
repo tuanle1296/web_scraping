@@ -64,3 +64,9 @@ class chi_yeu_minh_anh:
     chap_19_to_63 = "//div[@class='entry-content']//p//a[contains(text(), 'Chương INPUT')]"
     chap_ = "//div[@class='entry-content']//p//span[contains(text(), 'Chương INPUT')]/../../a"
 
+class cho_hoang_va_xuong:
+    title = "chapter-title"
+    content = "chapter-content"
+    close_ads_btn = (By.XPATH, "//span[contains(text(), 'Close')]")
+    next_chap = (By.XPATH, "//div[@class='chapter-button'][1]//a[@class='nextChapter']")
+
