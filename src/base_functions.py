@@ -53,21 +53,6 @@ class base(object):
     def switch_back_to_default(self):
         self.switch_back_to_default()
 
-    def scroll_web_page_to_the_end(self):
-        pause_time = 0.5
-        # Get scroll height
-        last_height = self.driver.execute_script("return document.body.scrollHeight")
-        while True:
-            # Scroll down to bottom
-            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            # Wait to load page
-            time.sleep(pause_time)
-            # Calculate new scroll height and compare with last scroll height
-            new_height = self.driver.execute_script("return document.body.scrollHeight")
-            if new_height == last_height:
-                break
-            last_height = new_height
-
     @staticmethod
     def remove_file_if_exists(file):
         try:
@@ -187,6 +172,74 @@ class base(object):
     def get_body_by_id(soup, body_element):
         body = soup.find(id=body_element)
         return body
+
+    def add_text_to_doc_file(self, title, text):
+        document = docx.Document()
+        try:
+            document.add_heading(title)
+            document.add_paragraph(text)
+        except Exception as e:
+            raise Exception("Exception while adding text to doc file.", e)
+        finally:
+            document.save(os.path.join(self.path, title + ".docx"))
+
+    def scroll_web_page_to_the_end(self):
+        last_height = self.driver.execute_script("return document.body.scrollHeight")
+
+        while True:
+            self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            time.sleep(2)  # Adjust based on network/content load speed
+
+            new_height = self.driver.execute_script("return document.body.scrollHeight")
+            if new_height == last_height:
+                break
+            last_height = new_height
+
+    def is_element_visible(self, element):
+        is_visible = (
+                element.is_displayed() and
+                self.driver.execute_script("""
+                        const rect = arguments[0].getBoundingClientRect();
+                        return (
+                            rect.top >= 0 &&
+                            rect.left >= 0 &&
+                            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+                        );
+                    """, element)
+        )
+        return is_visible
+
+    def scroll_into_view(self, element):
+        is_visible = self.is_element_visible(element)
+        while not is_visible:
+            self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
+            is_visible = self.is_element_visible(element)
+
+    def get_element_text(self):
+        story_reading = self.driver.find_element(By.CSS_SELECTOR, "#story-reading")
+        header = story_reading.find_element(By.CSS_SELECTOR, "header.panel-reading h1")
+
+        part = story_reading.find_element(By.CSS_SELECTOR, "#parts-container-new")
+        self.scroll_web_page_to_the_end()
+        time.sleep(2)
+        elements = part.find_elements(By.CSS_SELECTOR, ".page")
+        line = []
+        for element in elements:
+            pre_tag = element.find_element(By.TAG_NAME, "pre")
+            line.append(pre_tag.text)
+
+        text = " ".join(line)
+        self.add_text_to_doc_file(header.text, text)
+
+    def get_chapter_links(self):
+        chapter_list = self.driver.find_element(By.CSS_SELECTOR, "div [data-testid='toc'] ul[aria-label='story-parts']")
+        all_links = chapter_list.find_elements(By.CSS_SELECTOR, "a")
+        links = []
+        for link in all_links:
+            chapter_link = link.get_attribute("href")
+            links.append(chapter_link)
+        return links
 
     def close_browser(self):
         self.driver.close()

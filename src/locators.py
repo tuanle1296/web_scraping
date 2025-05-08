@@ -70,3 +70,7 @@ class cho_hoang_va_xuong:
     close_ads_btn = (By.XPATH, "//span[contains(text(), 'Close')]")
     next_chap = (By.XPATH, "//div[@class='chapter-button'][1]//a[@class='nextChapter']")
 
+class hoa_hon:
+    body_part = (By.CSS_SELECTOR, "#story-reading")
+    parts = (By.CSS_SELECTOR, ".panel-reading pre")
+
