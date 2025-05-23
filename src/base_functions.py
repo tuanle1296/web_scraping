@@ -1,8 +1,14 @@
 import pathlib
+import string
+from logging import raiseExceptions
+from typing import Tuple, Optional, List
+
 import docx
 import time
 from selenium import webdriver
+from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
@@ -89,7 +95,7 @@ class base(object):
         finally:
             f.close()
 
-    def press_Enter(self, element):
+    def press_enter(self, element):
         WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).send_keys(Keys.ENTER)
 
     def input_text(self, element, text):
@@ -195,7 +201,7 @@ class base(object):
                 break
             last_height = new_height
 
-    def is_element_visible(self, element):
+    def is_element_visible(self, element) -> bool:
         is_visible = (
                 element.is_displayed() and
                 self.driver.execute_script("""
@@ -216,30 +222,29 @@ class base(object):
             self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
             is_visible = self.is_element_visible(element)
 
-    def get_element_text(self):
-        story_reading = self.driver.find_element(By.CSS_SELECTOR, "#story-reading")
-        header = story_reading.find_element(By.CSS_SELECTOR, "header.panel-reading h1")
+    def find_element(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> WebElement or None:
+        locator_strategy, locator_value = style_tuple
+        if parent_element:
+            element = parent_element.find_element(locator_strategy, locator_value)
+        else:
+            element = self.driver.find_element(locator_strategy, locator_value)
+        return element
 
-        part = story_reading.find_element(By.CSS_SELECTOR, "#parts-container-new")
-        self.scroll_web_page_to_the_end()
-        time.sleep(2)
-        elements = part.find_elements(By.CSS_SELECTOR, ".page")
-        line = []
-        for element in elements:
-            pre_tag = element.find_element(By.TAG_NAME, "pre")
-            line.append(pre_tag.text)
+    def find_elements(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> List[WebElement]:
+        locator_strategy, locator_value = style_tuple
+        if parent_element:
+            elements = parent_element.find_elements(locator_strategy, locator_value)
+        else:
+            elements = self.driver.find_elements(locator_strategy, locator_value)
+        return elements
 
-        text = " ".join(line)
-        self.add_text_to_doc_file(header.text, text)
-
-    def get_chapter_links(self):
-        chapter_list = self.driver.find_element(By.CSS_SELECTOR, "div [data-testid='toc'] ul[aria-label='story-parts']")
-        all_links = chapter_list.find_elements(By.CSS_SELECTOR, "a")
-        links = []
-        for link in all_links:
-            chapter_link = link.get_attribute("href")
-            links.append(chapter_link)
-        return links
+    @staticmethod
+    def get_element_text(element) -> string:
+        try:
+            text = element.text.strip()
+            return text
+        except Exception as e:
+            raise Exception(f"An exception occurred while getting element text.", e)
 
     def close_browser(self):
         self.driver.close()

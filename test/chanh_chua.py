@@ -58,7 +58,7 @@ def main(folder_name):
                 try:
                     crawl.input_text(locators.pass_input_field, locators.pass_1)
                     time.sleep(2)
-                    crawl.press_Enter(locators.pass_input_field)
+                    crawl.press_enter(locators.pass_input_field)
                     time.sleep(5)
                 except:
                     pass
@@ -66,7 +66,7 @@ def main(folder_name):
                 try:
                     crawl.input_text(locators.pass_input_field, locators.pass_2)
                     time.sleep(2)
-                    crawl.press_Enter(locators.pass_input_field)
+                    crawl.press_enter(locators.pass_input_field)
                     time.sleep(5)
                 except:
                     pass
@@ -74,7 +74,7 @@ def main(folder_name):
                 try:
                     crawl.input_text(locators.pass_input_field, locators.pass_3)
                     time.sleep(2)
-                    crawl.press_Enter(locators.pass_input_field)
+                    crawl.press_enter(locators.pass_input_field)
                     time.sleep(5)
                 except:
                     pass

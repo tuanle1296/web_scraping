@@ -2,6 +2,7 @@ import sys
 from src.base_functions import *
 from src.locators import kethonsailam
 import threading
+from dataclasses import dataclass
 
 '''============Multi thread=========='''
 # def crawl_data(folder_name):
@@ -27,12 +28,20 @@ import threading
 
 '''Will implement in the future to make code shorter'''
 
-chap_url_1_to_31 = "https://aishihouse.wordpress.com/2011/11/24/ket-hon-sai-lam-chuong-1/"
-chap_url_32_to_57 = "https://trahoaquan20.wordpress.com/2020/03/07/chuong-32-lau-bui-chuyen-xua/"
-chap_url_ngoai_truyen_1 = "https://trahoaquan20.wordpress.com/2020/05/29/nt1-nhat-ky-nghich-ngom-dang-yeu-cua-au-tieu-vu/"
-chap_url_ngoai_truyen_2 = "https://trahoaquan20.wordpress.com/2020/05/29/ngoai-truyen-2-hai-nguoi-qua-duong-a-va-b/"
-chap_url_ngoai_truyen_3 = "https://trahoaquan20.wordpress.com/2020/05/29/nt3-neu-nhu-tinh-yeu-co-the-quay-lai-tu-dau/"
 
+@dataclass()
+class Data:
+    chap_url_1_to_31 : str = "https://aishihouse.wordpress.com/2011/11/24/ket-hon-sai-lam-chuong-1/"
+    chap_url_32_to_57 : str = "https://trahoaquan20.wordpress.com/2020/03/07/chuong-32-lau-bui-chuyen-xua/"
+    chap_url_ngoai_truyen_1 : str = "https://trahoaquan20.wordpress.com/2020/05/29/nt1-nhat-ky-nghich-ngom-dang-yeu-cua-au-tieu-vu/"
+    chap_url_ngoai_truyen_2 : str = "https://trahoaquan20.wordpress.com/2020/05/29/ngoai-truyen-2-hai-nguoi-qua-duong-a-va-b/"
+    chap_url_ngoai_truyen_3 : str = "https://trahoaquan20.wordpress.com/2020/05/29/nt3-neu-nhu-tinh-yeu-co-the-quay-lai-tu-dau/"
+    file_name : str = "testdata.html"
+    file_name_2 : str = "testdata2.html"
+    html_parser : str = "html.parser"
+
+
+data = Data()
 
 def crawl_from_chap_1_to_31(folder_name):
     print("=======Create folder=======")
@@ -44,7 +53,7 @@ def crawl_from_chap_1_to_31(folder_name):
         print(e)
     locators_1 = kethonsailam()
     print("=======Start crawling from chap 1 to 31=======")
-    crawl_1.go_to_webpage(chap_url_1_to_31)
+    crawl_1.go_to_webpage(data.chap_url_1_to_31)
     for i in range(0, 32):
         try:
             crawl_1.click_element(locators_1.close_cookies_banner)
@@ -73,7 +82,7 @@ def crawl_from_chap_32_to_57(folder_name):
         print(e)
     locators_2 = kethonsailam()
     print("=======Start crawling from chap 32 to 57=======")
-    crawl_2.go_to_webpage(chap_url_32_to_57)
+    crawl_2.go_to_webpage(data.chap_url_32_to_57)
     for i in range(31, 58):
         try:
             crawl_2.click_element(locators_2.close_cookies_banner)
@@ -102,7 +111,7 @@ def crawl_ngoai_truyen_1(folder_name, password):
         print(e)
     locators_3 = kethonsailam()
     print("=======Start crawling from ngoai truyen 1=======")
-    crawl_3.go_to_webpage(chap_url_ngoai_truyen_1)
+    crawl_3.go_to_webpage(data.chap_url_ngoai_truyen_1)
     crawl_3.click_element(locators_3.close_cookies_banner)
     crawl_3.input_text(locators_3.password_field, password)
     crawl_3.click_element(locators_3.submit_password_btn)
@@ -130,7 +139,7 @@ def crawl_ngoai_truyen_2(folder_name, password):
         print(e)
     locators_4 = kethonsailam()
     print("=======Start crawling from ngoai truyen 2=======")
-    crawl_4.go_to_webpage(chap_url_ngoai_truyen_2)
+    crawl_4.go_to_webpage(data.chap_url_ngoai_truyen_2)
     crawl_4.click_element(locators_4.close_cookies_banner)
     crawl_4.input_text(locators_4.password_field, password)
     crawl_4.click_element(locators_4.submit_password_btn)
@@ -158,7 +167,7 @@ def crawl_ngoai_truyen_3(folder_name, password):
         print(e)
     locators_5 = kethonsailam()
     print("=======Start crawling from ngoai truyen 3=======")
-    crawl_5.go_to_webpage(chap_url_ngoai_truyen_3)
+    crawl_5.go_to_webpage(data.chap_url_ngoai_truyen_3)
     crawl_5.click_element(locators_5.close_cookies_banner)
     crawl_5.input_text(locators_5.password_field, password)
     crawl_5.click_element(locators_5.submit_password_btn)
