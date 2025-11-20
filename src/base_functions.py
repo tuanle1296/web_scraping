@@ -1,6 +1,4 @@
 import pathlib
-import string
-from logging import raiseExceptions
 from typing import Tuple, Optional, List
 
 import docx
@@ -53,18 +51,19 @@ class base(object):
         self.driver.set_window_size(s('Width'), s('Height'))  # May need manual adjustment
         self.driver.find_element(By.TAG_NAME, 'body').screenshot(name)
 
-    def switch_frame(self):
-        self.switch_frame()
+    def switch_frame(self, frame_reference):
+        """Switch to a frame by WebElement, name, or index."""
+        self.driver.switch_to.frame(frame_reference)
 
     def switch_back_to_default(self):
-        self.switch_back_to_default()
+        self.driver.switch_to.default_content()
 
     @staticmethod
     def remove_file_if_exists(file):
         try:
-            os.path.exists(file)
-            os.remove(file)
-        except:
+            if os.path.exists(file):
+                os.remove(file)
+        except Exception:
             pass
 
     def define_img_name(self, title):
@@ -88,6 +87,54 @@ class base(object):
         source = self.driver.page_source
         return source
 
+    def wait_for_page_load(self, timeout: Optional[int] = None) -> bool:
+        """Wait until document.readyState == 'complete'. Returns True if loaded, False on timeout."""
+        wait_time = timeout if timeout is not None else self.timeout
+        try:
+            WebDriverWait(self.driver, wait_time).until(
+                lambda d: d.execute_script('return document.readyState') == 'complete'
+            )
+            return True
+        except Exception:
+            return False
+
+    def wait_for_js_condition(self, js_condition: str, timeout: Optional[int] = None) -> bool:
+        """Wait until the supplied JavaScript condition evaluates to a truthy value.
+
+        Example: wait_for_js_condition('return window.someVar === true')
+        """
+        wait_time = timeout if timeout is not None else self.timeout
+        try:
+            WebDriverWait(self.driver, wait_time).until(
+                lambda d: d.execute_script(js_condition)
+            )
+            return True
+        except Exception:
+            return False
+
+    def wait_for_jquery(self, timeout: Optional[int] = None) -> bool:
+        """Wait until jQuery active requests are finished (if jQuery is present).
+
+        Falls back to True if jQuery is not present on the page.
+        """
+        wait_time = timeout if timeout is not None else self.timeout
+        try:
+            def _jq_inactive(d):
+                try:
+                    return d.execute_script('return (typeof jQuery !== "undefined") ? jQuery.active == 0 : true')
+                except Exception:
+                    return True
+
+            WebDriverWait(self.driver, wait_time).until(_jq_inactive)
+            return True
+        except Exception:
+            return False
+
+    def wait_for_element_visible(self, style_tuple: Tuple[By, str], timeout: Optional[int] = None) -> WebElement:
+        """Wait until the element located by `style_tuple` is visible and return it."""
+        wait_time = timeout if timeout is not None else self.timeout
+        return WebDriverWait(self.driver, wait_time).until(EC.visibility_of_element_located(style_tuple))
+
     def pass_data_to_file(self, source, file_name):
         try:
             f = open(file_name, "w")
@@ -102,9 +149,10 @@ class base(object):
         WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).send_keys(text)
 
     def open_new_tab(self, url, tab_number=1):
-        self.driver.execute_script('''window.open('about:blank', ''' +
-                                   str(tab_number) + ''');''')
-        self.driver.switch_to.window(str(tab_number))
+        # Open a new blank tab and switch to the newly created window handle
+        self.driver.execute_script("window.open('');")
+        new_handle = self.driver.window_handles[-1]
+        self.driver.switch_to.window(new_handle)
         self.driver.get(url)
 
     def count_number_of_tabs(self):
@@ -122,15 +170,19 @@ class base(object):
         return True
 
     def get_attribute_from_all_elements(self, element, tag):
-        list = []
+        attrs = []
         list_of_elements = WebDriverWait(self.driver, self.timeout).until(EC.visibility_of_all_elements_located(element))
         for i in list_of_elements:
-            list.append(i.get_attribute(tag))
-        return list
+            attrs.append(i.get_attribute(tag))
+        return attrs
 
     def get_attribute_from_element(self, element, tag):
         e = WebDriverWait(self.driver, self.timeout).until(EC.visibility_of_element_located(element)).get_attribute(tag)
         return e
+    
+    def get_element_attribute(self, element: WebElement, tag: str) -> str:
+        attr = element.get_attribute(tag)
+        return attr
 
     @staticmethod
     def replace_text(base_string, text_be_replaced, text_to_replace):
@@ -222,7 +274,7 @@ class base(object):
             self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
             is_visible = self.is_element_visible(element)
 
-    def find_element(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> WebElement or None:
+    def find_element(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> Optional[WebElement]:
         locator_strategy, locator_value = style_tuple
         if parent_element:
             element = parent_element.find_element(locator_strategy, locator_value)
@@ -239,12 +291,12 @@ class base(object):
         return elements
 
     @staticmethod
-    def get_element_text(element) -> string:
+    def get_element_text(element) -> str:
         try:
             text = element.text.strip()
             return text
         except Exception as e:
-            raise Exception(f"An exception occurred while getting element text.", e)
+            raise Exception("An exception occurred while getting element text.") from e
 
     def close_browser(self):
         self.driver.close()

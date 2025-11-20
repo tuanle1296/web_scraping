@@ -87,3 +87,10 @@ class hoa_hon:
     story_parts : tuple[By, str] = (By.CSS_SELECTOR, "div [data-testid='toc'] ul[aria-label='story-parts']")
     all_links : tuple[By, str] = (By.CSS_SELECTOR, "a")
 
+@dataclass()
+class khi_gio_noi_len:
+    header : str = "entry-title"
+    content : str = "entry-content"
+    list_chap : tuple[By, str] = (By.CSS_SELECTOR, ".has-text-align-center")
+    chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
+
