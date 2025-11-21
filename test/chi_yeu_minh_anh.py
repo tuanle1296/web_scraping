@@ -1,12 +1,17 @@
-from concurrent.futures import thread
+from dataclasses import dataclass
 import threading
 from src.base_functions import *
 from src.locators import chi_yeu_minh_anh
 
 
-url_1 = "https://nhuoclinh.wordpress.com/truyen-dai/hi%e1%bb%87n-d%e1%ba%a1i/du-an-chi-yeu-minh-anh/?fbclid=IwAR299zfBfrFHwnhVyx_x45uzH4G64mSFSv9vnaAtporVkQjIQPaxh55dHFk"
-url_2 = "https://chihoavancac.wordpress.com/home/truyen-trong-nha/on-going/hien-dai-chi-yeu-minh-anh-na-khau-trung/?fbclid=IwAR21Zg3-f2SmS0r9T0lgJCe30EMcrpEr8t5T6gdFs-xAH3sOIrRAb2RkPxE"
+@dataclass()
+class Url:
+    url_1 : str = "https://nhuoclinh.wordpress.com/truyen-dai/hi%e1%bb%87n-d%e1%ba%a1i/du-an-chi-yeu-minh-anh/?fbclid=IwAR299zfBfrFHwnhVyx_x45uzH4G64mSFSv9vnaAtporVkQjIQPaxh55dHFk"
+    url_2 : str = "https://chihoavancac.wordpress.com/home/truyen-trong-nha/on-going/hien-dai-chi-yeu-minh-anh-na-khau-trung/?fbclid=IwAR21Zg3-f2SmS0r9T0lgJCe30EMcrpEr8t5T6gdFs-xAH3sOIrRAb2RkPxE"
+    href_attribute : str = "href"
+    facebook_text : str = "facebook"
 
+web_data = Url()
 
 def main(folder_name, url, chap_locator):
     print("=======Create folder=======")
@@ -19,7 +24,7 @@ def main(folder_name, url, chap_locator):
     locators = chi_yeu_minh_anh
     crawl.go_to_webpage(url)
     print("=========Start crawling==========")
-    chap_url = crawl.get_attribute_from_all_elements(chap_locator, "href")
+    chap_url = crawl.get_attribute_from_all_elements(chap_locator, web_data.href_attribute)
     for item in chap_url:
         crawl.go_to_webpage(item)
         soup = crawl.crawl_data(item)
@@ -53,13 +58,13 @@ def main_2(folder_name, url):
         cur_chap = crawl.replace_text(locators.chap_19_to_63, "INPUT", str(ii))
         cur_chap_temp = crawl.replace_text(locators.chap_, "INPUT", str(ii))
         try:
-            chap_url = crawl.get_attribute_from_element((By.XPATH, cur_chap), "href")
+            chap_url = crawl.get_attribute_from_element((By.XPATH, cur_chap), web_data.href_attribute)
         except:
-            chap_url = crawl.get_attribute_from_element((By.XPATH, cur_chap_temp), "href")
+            chap_url = crawl.get_attribute_from_element((By.XPATH, cur_chap_temp), web_data.href_attribute)
         chap_list.append(chap_url)
     for i in range(len(chap_list)):
         print(chap_list[i])
-        if "facebook" in chap_list[i]:
+        if web_data.facebook_text in chap_list[i]:
             print("Skip")
         crawl.go_to_webpage(chap_list[i])
 
@@ -90,13 +95,13 @@ if __name__ == '__main__':
         
 
     for i in range(len(chap_1_to_18)):
-        process = threading.Thread(target=main, args=("Chi yeu minh anh", url_1, chap_1_to_18[i]))
+        process = threading.Thread(target=main, args=("Chi yeu minh anh", web_data.url_1, chap_1_to_18[i]))
         process.start()
         threads.append(process)
-    process = threading.Thread(target=main, args=("Chi yeu minh anh", url_1, lo.chap_gioi_thieu))
+    process = threading.Thread(target=main, args=("Chi yeu minh anh", web_data.url_1, lo.chap_gioi_thieu))
     process.start()
     threads.append(process)
-    process = threading.Thread(target=main_2, args=("Chi yeu minh anh", url_2))
+    process = threading.Thread(target=main_2, args=("Chi yeu minh anh", web_data.url_2))
     process.start()
     threads.append(process)
 
