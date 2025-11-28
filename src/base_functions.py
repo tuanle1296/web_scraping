@@ -212,24 +212,19 @@ class base(object):
             document.save(os.path.join(self.path, str(title.text) + ".docx"))
 
     @staticmethod
-    def get_title_by_class(soup, title_element):
-        title = soup.find(class_=title_element)
-        return title
+    def get_element_by_tag(soup, tag, class_name):
+        element = soup.find(tag, class_=class_name)
+        return element
 
     @staticmethod
-    def get_body_by_class(soup, body_element):
-        body = soup.find(class_=body_element)
-        return body
+    def get_element_by_class(soup, class_name):
+        element = soup.find(class_=class_name)
+        return element
 
     @staticmethod
-    def get_title_by_id(soup, title_element):
-        title = soup.find(id=title_element)
-        return title
-
-    @staticmethod
-    def get_body_by_id(soup, body_element):
-        body = soup.find(id=body_element)
-        return body
+    def get_element_by_id(soup, id_element):
+        element = soup.find(id=id_element)
+        return element
 
     def add_text_to_doc_file(self, title, text):
         document = docx.Document()

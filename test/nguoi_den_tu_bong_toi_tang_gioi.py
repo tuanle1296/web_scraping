@@ -20,8 +20,8 @@ def main(folder_name):
     for item in chap_url:
         crawl.go_to_webpage(item)
         soup = crawl.crawl_data(item)
-        chap_title = crawl.get_title_by_class(soup, locators.cur_title)
-        chap_content = crawl.get_body_by_class(soup, locators.cur_content)
+        chap_title = crawl.get_element_by_class(soup, locators.cur_title)
+        chap_content = crawl.get_element_by_class(soup, locators.cur_content)
         print(chap_title.text)
         is_content = crawl.wait_until_page_contains(locators.is_content_img)
         print("is content image: ", is_content)

@@ -31,8 +31,8 @@ def crawl_truyen(folder_name):
         crawl.pass_data_to_file(page, "datafile.html")
         with open("datafile.html", 'r') as file:
             beautifulSoupText = BeautifulSoup(file.read(), 'html.parser')
-            chap_title = crawl.get_title_by_class(beautifulSoupText, locators.chap_title)
-            chap_content = crawl.get_body_by_class(beautifulSoupText, locators.chap_content)
+            chap_title = crawl.get_element_by_class(beautifulSoupText, locators.chap_title)
+            chap_content = crawl.get_element_by_class(beautifulSoupText, locators.chap_content)
             crawl.save_doc(chap_title, chap_content)
         print("Chap title: ", str(chap_title.text).strip())
     crawl.remove_file_if_exists("datafile.html")
