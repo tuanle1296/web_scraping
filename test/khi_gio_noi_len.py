@@ -41,8 +41,8 @@ def main(folder_name):
         if not crawl.wait_for_page_load(timeout=20):
             print("Page did not finish loading in 20s — handle fallback or retry")
         soup = crawl.crawl_data(href)
-        chap_title = crawl.get_title_by_class(soup, locators.header)
-        chap_content = crawl.get_body_by_class(soup, locators.content)
+        chap_title = crawl.get_element_by_class(soup, locators.header)
+        chap_content = crawl.get_element_by_class(soup, locators.content)
         crawl.save_doc(chap_title, chap_content)
     
     print("=======FINISHED=======")

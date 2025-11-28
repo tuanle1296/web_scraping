@@ -28,8 +28,8 @@ def main(folder_name, url, chap_locator):
     for item in chap_url:
         crawl.go_to_webpage(item)
         soup = crawl.crawl_data(item)
-        chap_title = crawl.get_title_by_class(soup, locators.title)
-        chap_content = crawl.get_body_by_class(soup, locators.content)
+        chap_title = crawl.get_element_by_class(soup, locators.title)
+        chap_content = crawl.get_element_by_class(soup, locators.content)
         print(chap_title.text)
         is_content = crawl.wait_until_page_contains(locators.is_content_img, 2)
         print("is content image: ", is_content)
@@ -70,8 +70,8 @@ def main_2(folder_name, url):
 
         soup = crawl.crawl_data(chap_list[i])
         try:
-            chap_title = crawl.get_title_by_class(soup, locators.title)
-            chap_content = crawl.get_body_by_class(soup, locators.content)
+            chap_title = crawl.get_element_by_class(soup, locators.title)
+            chap_content = crawl.get_element_by_class(soup, locators.content)
             print(chap_title.text)
             is_content = crawl.wait_until_page_contains(locators.is_content_img, 2)
             print("is content image: ", is_content)

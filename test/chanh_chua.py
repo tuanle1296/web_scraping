@@ -51,8 +51,8 @@ def main(folder_name):
                 url = crawl.get_current_url()
                 print(url)
                 soup = crawl.crawl_data(url)
-                chap_title = crawl.get_title_by_class(soup, locators.cur_title)
-                chap_content = crawl.get_body_by_class(soup, locators.cur_content)
+                chap_title = crawl.get_element_by_class(soup, locators.cur_title)
+                chap_content = crawl.get_element_by_class(soup, locators.cur_content)
                 crawl.save_doc(chap_title, chap_content)
             if 21 <= i <= 25:
                 try:
@@ -84,8 +84,8 @@ def main(folder_name):
                 crawl.pass_data_to_file(page, "testdata.html")
                 with open("testdata.html", 'r') as file:
                     beautifulSoupText = BeautifulSoup(file.read(), 'html.parser')
-                    chap_title = crawl.get_title_by_class(beautifulSoupText, locators.cur_title)
-                    chap_content = crawl.get_body_by_class(beautifulSoupText, locators.cur_content)
+                    chap_title = crawl.get_element_by_class(beautifulSoupText, locators.cur_title)
+                    chap_content = crawl.get_element_by_class(beautifulSoupText, locators.cur_content)
                     crawl.save_doc(chap_title, chap_content)
             # else:
             #     soup = crawl.crawl_data(url)
@@ -107,15 +107,15 @@ def main(folder_name):
         if 1 <= i <= 73:
             next = locators.next_chap
             next = crawl.replace_text(next, "INPUT", str(i))
-            chap_url = crawl.get_attribute_from_tag((By.XPATH, next), 'href')
+            chap_url = crawl.get_attribute_from_element((By.XPATH, next), 'href')
         if 74 <= i <= 85:
             next = locators.next_chap_ngoai
             if 1 <= chuong_ngoai < 10:
                 next = crawl.replace_text(next, "INPUT", "0" + str(chuong_ngoai))
-                chap_url = crawl.get_attribute_from_tag((By.XPATH, next), 'href')
+                chap_url = crawl.get_attribute_from_element((By.XPATH, next), 'href')
             else:
                 next = crawl.replace_text(next, "INPUT", str(chuong_ngoai))
-                chap_url = crawl.get_attribute_from_tag((By.XPATH, next), 'href')
+                chap_url = crawl.get_attribute_from_element((By.XPATH, next), 'href')
             chuong_ngoai = chuong_ngoai + 1
             if chuong_ngoai > 12:
                 flag = "true"

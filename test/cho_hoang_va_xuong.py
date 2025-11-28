@@ -40,8 +40,8 @@ def start_crawl(folder_name):
             pass
         url = crawl.get_current_url()
         soup = crawl.crawl_data(url)
-        chap_title = crawl.get_title_by_class(soup, locators.title)
-        chap_content = crawl.get_body_by_class(soup, locators.content)
+        chap_title = crawl.get_element_by_class(soup, locators.title)
+        chap_content = crawl.get_element_by_class(soup, locators.content)
         print("url from chap: " + str(chap_title.text) + " " + str(url))
         crawl.save_doc(chap_title, chap_content)
 

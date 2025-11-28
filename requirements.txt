@@ -2,3 +2,6 @@ beautifulsoup4
 requests
 selenium
 python-docx
+webdriver-manager
+pytesseract
+Pillow
