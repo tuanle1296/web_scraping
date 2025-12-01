@@ -68,7 +68,7 @@ def scrape_chapter_content(url, crawl_instance, locators_instance):
         print(f"   -> Successfully saved: {title}.docx")
             
     except Exception as e:
-        print(f"Error: {e}")
+        raise(f"Error: {e}")
 
 def scrape_story(base_url):
     """Finds all chapter links from a story page and scrapes each one."""
