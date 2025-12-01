@@ -94,3 +94,10 @@ class khi_gio_noi_len:
     list_chap : tuple[By, str] = (By.CSS_SELECTOR, ".has-text-align-center")
     chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
 
+@dataclass()
+class chuyen_cu_kinh_cang:
+    title_element : tuple[str, str] = ("h1", "entry-title")
+    content_element : tuple[str, str] = ("div", "entry-content clear")
+    title : str = "title"
+    chapter_link : str = "h2.entry-title a[href]"
+
