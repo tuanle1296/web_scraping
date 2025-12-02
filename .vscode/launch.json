@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Debug co_truong_cat_canh_di",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/test/co_truong_cat_canh_di.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
