@@ -1,6 +1,5 @@
 import pathlib
 from typing import Tuple, Optional, List
-
 import docx
 import time
 from selenium import webdriver
@@ -221,10 +220,10 @@ class base(object):
         element = soup.find(class_=class_name)
         return element
 
-    @staticmethod
-    def get_element_by_id(soup, id_element):
-        element = soup.find(id=id_element)
-        return element
+    # @staticmethod
+    # def get_element_by_id(soup, id_element):
+    #     element = soup.find(id=id_element)
+    #     return element
 
     def add_text_to_doc_file(self, title, text):
         document = docx.Document()

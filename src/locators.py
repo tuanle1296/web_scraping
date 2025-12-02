@@ -101,3 +101,10 @@ class chuyen_cu_kinh_cang:
     title : str = "title"
     chapter_link : str = "h2.entry-title a[href]"
 
+@dataclass()
+class co_truong_cat_canh_di:
+    chapter_blocks : tuple[By, str] = (By.XPATH, "//div[@id='TIEU-DE']//span[text()='Mục lục']/../../../..")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    title : tuple[str, str] = ("h1", "entry-title")
+    content : tuple[str, str] = ("div", "entry-content")
+
