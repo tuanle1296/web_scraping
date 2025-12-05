@@ -133,6 +133,15 @@ class base(object):
         """Wait until the element located by `style_tuple` is visible and return it."""
         wait_time = timeout if timeout is not None else self.timeout
         return WebDriverWait(self.driver, wait_time).until(EC.visibility_of_element_located(style_tuple))
+    
+    def wait_for_element_visible_and_return_true_false(self, style_tuple: Tuple[By, str], timeout: Optional[int] = None) -> bool:
+        """Wait until the element located by `style_tuple` is visible and return it."""
+        wait_time = timeout if timeout is not None else self.timeout
+        try:
+            WebDriverWait(self.driver, wait_time).until(EC.visibility_of_element_located(style_tuple))
+            return True
+        except:
+            return False
 
     def pass_data_to_file(self, source, file_name):
         try:
@@ -268,12 +277,19 @@ class base(object):
             self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
             is_visible = self.is_element_visible(element)
 
-    def find_element(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> Optional[WebElement]:
+    def find_element_by_tuple(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> Optional[WebElement]:
         locator_strategy, locator_value = style_tuple
         if parent_element:
             element = parent_element.find_element(locator_strategy, locator_value)
         else:
             element = self.driver.find_element(locator_strategy, locator_value)
+        return element
+
+    def find_element(self, element: WebElement, parent_element: Optional[WebElement] = None) -> Optional[WebElement]:
+        if parent_element:
+            element = parent_element.find_element(element)
+        else:
+            element = self.driver.find_element(element)
         return element
 
     def find_elements(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> List[WebElement]:

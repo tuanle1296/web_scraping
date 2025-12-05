@@ -108,3 +108,12 @@ class co_truong_cat_canh_di:
     title : tuple[str, str] = ("h1", "entry-title")
     content : tuple[str, str] = ("div", "entry-content")
 
+@dataclass()
+class tulip_trong_gio:
+    beginning_chapter_block : tuple[By, str] = (By.XPATH, "//strong[text()='Danh sách chương: ']/..")
+    endding_chapter_block : tuple[By, str] = (By.XPATH, "p[text()='Hoàn toàn văn.']")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    title : tuple[By, str] = (By.CSS_SELECTOR, ".entry-title")
+    content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+    pass_word_input_field : tuple[By,str] = (By.CSS_SELECTOR, ".post-password-form__input")
+    password_submit_button : tuple[By,str] = (By.CSS_SELECTOR, ".post-password-form__submit")

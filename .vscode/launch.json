@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Debug co_truong_cat_canh_di",
+            "name": "Python: Debug tulip_trong_gio",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/test/co_truong_cat_canh_di.py",
+            "program": "${workspaceFolder}/test/tulip_trong_gio.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}"
