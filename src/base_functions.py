@@ -3,7 +3,6 @@ from typing import Tuple, Optional, List
 import docx
 import time
 from selenium import webdriver
-from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
@@ -128,20 +127,21 @@ class base(object):
             return True
         except Exception:
             return False
-
-    def wait_for_element_visible(self, style_tuple: Tuple[By, str], timeout: Optional[int] = None) -> WebElement:
-        """Wait until the element located by `style_tuple` is visible and return it."""
-        wait_time = timeout if timeout is not None else self.timeout
-        return WebDriverWait(self.driver, wait_time).until(EC.visibility_of_element_located(style_tuple))
     
-    def wait_for_element_visible_and_return_true_false(self, style_tuple: Tuple[By, str], timeout: Optional[int] = None) -> bool:
-        """Wait until the element located by `style_tuple` is visible and return it."""
+    def wait_for_element_visible(self, element, timeout: Optional[int] = None) -> WebElement | None:
+        """Wait until the element is visible and return it."""
         wait_time = timeout if timeout is not None else self.timeout
-        try:
-            WebDriverWait(self.driver, wait_time).until(EC.visibility_of_element_located(style_tuple))
-            return True
-        except:
-            return False
+        if isinstance(element, tuple):
+            try:
+                return WebDriverWait(self.driver, wait_time).until(EC.visibility_of_element_located(element))
+            except:
+                return None
+        elif isinstance(element, WebElement):
+            try:
+                return WebDriverWait(self.driver, wait_time).until(EC.visibility_of(element))
+            except:
+                return None
+        raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
     def pass_data_to_file(self, source, file_name):
         try:
@@ -149,14 +149,24 @@ class base(object):
             f.write(source)
         finally:
             f.close()
-
+        
     def press_enter(self, element):
-        WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).send_keys(Keys.ENTER)
+        if isinstance(element, WebElement):
+            element.send_keys(Keys.ENTER)
+        elif isinstance(element, tuple):
+            self.find_element(element).send_keys(Keys.ENTER)
+        else:
+            raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
     def input_text(self, element, text):
-        WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).send_keys(text)
+        if isinstance(element, WebElement):
+            element.send_keys(text)
+        elif isinstance(element, tuple):
+            self.find_element(element).send_keys(text)
+        else:
+            raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
-    def open_new_tab(self, url, tab_number=1):
+    def open_new_tab(self, url):
         # Open a new blank tab and switch to the newly created window handle
         self.driver.execute_script("window.open('');")
         new_handle = self.driver.window_handles[-1]
@@ -170,27 +180,25 @@ class base(object):
     def switch_tab(self, tab_number):
         self.driver.switch_to.window(self.driver.window_handles[tab_number])
 
-    def wait_until_page_contains(self, element, timeout=5):
-        try:
-            WebDriverWait(self.driver, timeout).until(EC.element_to_be_clickable(element))
-        except:
-            return False
-        return True
-
-    def get_attribute_from_all_elements(self, element, tag):
+    def get_attribute_from_all_elements(self, elements, attribute_name):
         attrs = []
-        list_of_elements = WebDriverWait(self.driver, self.timeout).until(EC.visibility_of_all_elements_located(element))
-        for i in list_of_elements:
-            attrs.append(i.get_attribute(tag))
+        list_of_elements = []
+        if isinstance(elements, tuple):
+            list_of_elements = self.find_elements(elements)
+        elif isinstance(elements, list) and all(isinstance(e, WebElement) for e in elements):
+            list_of_elements = elements
+        else:
+            raise TypeError("Invalid elements type. Must be a (By, str) tuple or a list of WebElements.")
+        for item in list_of_elements:
+            attrs.append(item.get_attribute(attribute_name))
         return attrs
 
-    def get_attribute_from_element(self, element, tag):
-        e = WebDriverWait(self.driver, self.timeout).until(EC.visibility_of_element_located(element)).get_attribute(tag)
-        return e
-    
-    def get_element_attribute(self, element: WebElement, tag: str) -> str:
-        attr = element.get_attribute(tag)
-        return attr
+    def get_attribute_from_element(self, element, attribute_name: str) -> str:
+        if isinstance(element, WebElement):
+            return element.get_attribute(attribute_name)
+        elif isinstance(element, tuple):
+            return self.find_element(element).get_attribute(attribute_name)
+        raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
     @staticmethod
     def replace_text(base_string, text_be_replaced, text_to_replace):
@@ -208,7 +216,7 @@ class base(object):
         soup = BeautifulSoup(req.content, "html.parser")
         return soup
 
-    def save_doc(self, title, body):
+    def save_doc(self, title, body) -> None:
         document = docx.Document()
         try:
             document.add_heading(title.get_text())
@@ -229,20 +237,17 @@ class base(object):
         element = soup.find(class_=class_name)
         return element
 
-    # @staticmethod
-    # def get_element_by_id(soup, id_element):
-    #     element = soup.find(id=id_element)
-    #     return element
-
-    def add_text_to_doc_file(self, title, text):
+    def add_text_to_doc_file(self, title: str, text: str, file_name: Optional[str] = None):
         document = docx.Document()
         try:
             document.add_heading(title)
             document.add_paragraph(text)
+            if (file_name):
+                document.save(os.path.join(self.path, file_name + ".docx"))
+            else:
+                document.save(os.path.join(self.path, title + ".docx"))
         except Exception as e:
-            raise Exception("Exception while adding text to doc file.", e)
-        finally:
-            document.save(os.path.join(self.path, title + ".docx"))
+            raise Exception(f"Exception while adding text to or saving doc file '{file_name or title}'.", e)
 
     def scroll_web_page_to_the_end(self):
         last_height = self.driver.execute_script("return document.body.scrollHeight")
@@ -277,20 +282,13 @@ class base(object):
             self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
             is_visible = self.is_element_visible(element)
 
-    def find_element_by_tuple(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> Optional[WebElement]:
-        locator_strategy, locator_value = style_tuple
-        if parent_element:
-            element = parent_element.find_element(locator_strategy, locator_value)
-        else:
-            element = self.driver.find_element(locator_strategy, locator_value)
-        return element
-
-    def find_element(self, element: WebElement, parent_element: Optional[WebElement] = None) -> Optional[WebElement]:
-        if parent_element:
-            element = parent_element.find_element(element)
-        else:
-            element = self.driver.find_element(element)
-        return element
+    def find_element(self, element_, parent_element: Optional[WebElement] = None) -> Optional[WebElement]:
+        target = parent_element if parent_element else self.driver
+        if isinstance(element_, tuple):
+            return target.find_element(*element_)
+        elif isinstance(element_, WebElement):
+            return element_ # Already a WebElement
+        raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
     def find_elements(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> List[WebElement]:
         locator_strategy, locator_value = style_tuple
@@ -299,14 +297,13 @@ class base(object):
         else:
             elements = self.driver.find_elements(locator_strategy, locator_value)
         return elements
-
-    @staticmethod
-    def get_element_text(element) -> str:
-        try:
-            text = element.text.strip()
-            return text
-        except Exception as e:
-            raise Exception("An exception occurred while getting element text.") from e
+        
+    def get_element_text(self, element) -> str:
+        if isinstance(element, WebElement):
+            return element.text.strip()
+        elif isinstance(element, tuple):
+            return self.find_element(element).text.strip()
+        raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
     def close_browser(self):
         self.driver.close()
