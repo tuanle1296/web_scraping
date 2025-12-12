@@ -248,6 +248,10 @@ class base(object):
                 document.save(os.path.join(self.path, title + ".docx"))
         except Exception as e:
             raise Exception(f"Exception while adding text to or saving doc file '{file_name or title}'.", e)
+        
+    @staticmethod
+    def sleep(delay_time):
+        time.sleep(delay_time)
 
     def scroll_web_page_to_the_end(self):
         last_height = self.driver.execute_script("return document.body.scrollHeight")

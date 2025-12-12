@@ -35,11 +35,11 @@ def crawl_chap_1_test():
         if status is True:
             story_reading = crawl_1.find_element(locators_1.body_part)
             if story_reading is None:
-                raise NoSuchElementException(f"No element found with locator {locators_1.body_part}")
+                raise Exception(f"No element found with locator {locators_1.body_part}")
             header = crawl_1.find_element(locators_1.header, story_reading)
             part = crawl_1.find_element(locators_1.part, story_reading)
             if header is None or part is None:
-                raise NoSuchElementException(f"No element found with locator {locators_1.header} or {locators_1.part}")
+                raise Exception(f"No element found with locator {locators_1.header} or {locators_1.part}")
 
             """Need to scroll to the end of the page to make all content display"""
 
