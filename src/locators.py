@@ -117,3 +117,10 @@ class tulip_trong_gio:
     content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
     pass_word_input_field : tuple[By,str] = (By.CSS_SELECTOR, ".post-password-form__input")
     password_submit_button : tuple[By,str] = (By.CSS_SELECTOR, ".post-password-form__submit")
+
+@dataclass()
+class cung_anh_di_den_tan_cung_the_gioi:
+    chapter_recognization : tuple[By, str] = (By.CSS_SELECTOR, "div.epub-view")
+    next_button : tuple[By, str] = (By.CSS_SELECTOR, "i.fas.fa-long-arrow-alt-right")
+    story_content : tuple[By, str] = (By.CSS_SELECTOR, "div.calibre")
+    iframe : tuple[By, str] = (By.XPATH, "//iframe[contains(@id, 'epubjs-view')]")
