@@ -124,3 +124,8 @@ class cung_anh_di_den_tan_cung_the_gioi:
     next_button : tuple[By, str] = (By.CSS_SELECTOR, "i.fas.fa-long-arrow-alt-right")
     story_content : tuple[By, str] = (By.CSS_SELECTOR, "div.calibre")
     iframe : tuple[By, str] = (By.XPATH, "//iframe[contains(@id, 'epubjs-view')]")
+
+@dataclass()
+class sau_khi_hon_nhan_tan_vo:
+    chap_title : tuple[By, str] = (By.CSS_SELECTOR, ".truyen-title")
+    chap_content : tuple[By, str] = (By.CSS_SELECTOR, ".chapter-c")
