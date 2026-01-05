@@ -129,3 +129,8 @@ class cung_anh_di_den_tan_cung_the_gioi:
 class sau_khi_hon_nhan_tan_vo:
     chap_title : tuple[By, str] = (By.CSS_SELECTOR, ".truyen-title")
     chap_content : tuple[By, str] = (By.CSS_SELECTOR, ".chapter-c")
+
+@dataclass()
+class anh_den_hoa_le:
+    chap_title : tuple[By, str] = (By.CSS_SELECTOR, ".truyen-title")
+    chap_content : tuple[By, str] = (By.CSS_SELECTOR, ".chapter-c")
