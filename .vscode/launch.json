@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Debug tulip_trong_gio",
+            "name": "Python: Debug buc_tuong_doi_mat_dau_goi",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/test/tulip_trong_gio.py",
+            "program": "${workspaceFolder}/test/buc_tuong_doi_mat_dau_goi.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}"
