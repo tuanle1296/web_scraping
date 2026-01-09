@@ -6,6 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import requests
@@ -15,14 +16,13 @@ import os
 
 class base(object):
 
-    def __init__(self, is_headless_mode=True, timeout=15):
+    def __init__(self, is_headless_mode=True, timeout=5):
         options = webdriver.ChromeOptions()
         options.add_argument('--deny-permission-prompts')
         options.headless = is_headless_mode
         self.driver = webdriver.Chrome(options=options)
         self.path = None
         self.timeout = timeout
-        self.driver.implicitly_wait(self.timeout)
 
     def create_folder(self, folder_name):
         cur_dir = os.path.abspath(os.getcwd())
@@ -36,9 +36,9 @@ class base(object):
     def verify_element(self, element, timeOut=5):
         try:
             WebDriverWait(self.driver, timeOut).until(EC.visibility_of_element_located(element))
+            return True
         except:
             return False
-        return True
 
     def count_elements(self, element):
         length = WebDriverWait(self.driver, self.timeout).until(EC.presence_of_all_elements_located(element))
@@ -85,15 +85,15 @@ class base(object):
         source = self.driver.page_source
         return source
 
-    def wait_for_page_load(self, timeout: Optional[int] = None) -> bool:
+    def wait_for_page_load(self, timeout: Optional[int] = None, poll_frequency: float = 0.5) -> bool:
         """Wait until document.readyState == 'complete'. Returns True if loaded, False on timeout."""
         wait_time = timeout if timeout is not None else self.timeout
         try:
-            WebDriverWait(self.driver, wait_time).until(
+            WebDriverWait(self.driver, wait_time, poll_frequency=poll_frequency).until(
                 lambda d: d.execute_script('return document.readyState') == 'complete'
             )
             return True
-        except Exception:
+        except TimeoutException:
             return False
 
     def wait_for_js_condition(self, js_condition: str, timeout: Optional[int] = None) -> bool:
@@ -266,19 +266,17 @@ class base(object):
             last_height = new_height
 
     def is_element_visible(self, element) -> bool:
-        is_visible = (
-                element.is_displayed() and
-                self.driver.execute_script("""
-                        const rect = arguments[0].getBoundingClientRect();
-                        return (
-                            rect.top >= 0 &&
-                            rect.left >= 0 &&
-                            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-                            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-                        );
-                    """, element)
-        )
-        return is_visible
+        if isinstance(element, tuple):
+            try:
+                web_element = self.find_element(element)
+            except:
+                return False
+        elif isinstance(element, WebElement):
+            web_element = element
+        else:
+            raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
+
+        return web_element.is_displayed()
 
     def scroll_into_view(self, element):
         is_visible = self.is_element_visible(element)

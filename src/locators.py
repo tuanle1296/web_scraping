@@ -134,3 +134,13 @@ class sau_khi_hon_nhan_tan_vo:
 class anh_den_hoa_le:
     chap_title : tuple[By, str] = (By.CSS_SELECTOR, ".truyen-title")
     chap_content : tuple[By, str] = (By.CSS_SELECTOR, ".chapter-c")
+
+@dataclass()
+class buc_tuong_doi_mat_dau_goi:
+    chap_urls_list : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content .wp-block-table")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    password_field : tuple[By, str] = (By.CSS_SELECTOR, "input[type='password']")
+    submit_password_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
+    invalid_password_message : tuple[By, str] = (By.CSS_SELECTOR, ".post-password-form-invalid-password")
+    chap_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
+    chap_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
