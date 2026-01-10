@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dataclasses import dataclass
 from src.base_functions import *
 from src.locators import hoa_hon
@@ -60,4 +63,4 @@ def crawl_chap_1_test():
 if __name__ == '__main__':
     crawl_chap_1_test()
 
-'''Note: run this code using cmd: python3 -m test.hoa_hon'''
+'''Note: run this code using cmd: python3 test/hoa_hon.py'''

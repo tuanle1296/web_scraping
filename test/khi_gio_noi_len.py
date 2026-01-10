@@ -57,4 +57,4 @@ if __name__ == '__main__':
         print("=======ENDED BY INTERRUPTING=======")
         f.quit_driver()
 
-'''Note: run this code using cmd: python3 -m test.khi_gio_noi_len'''
+'''Note: run this code using cmd: python3 test/khi_gio_noi_len.py'''

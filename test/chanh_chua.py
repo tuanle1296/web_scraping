@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.base_functions import *
 from src.locators import onlytlinh
 
@@ -136,4 +139,4 @@ if __name__ == '__main__':
         print("=======ENDED BY INTERRUPTING=======")
         f.quit_driver()
 
-'''Note: run this code using cmd: python3 -m test.chanh_chua'''
+'''Note: run this code using cmd: python3 test/chanh_chua.py'''

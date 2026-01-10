@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.base_functions import *
 from src.locators import cho_hoang_va_xuong
 from dataclasses import dataclass
@@ -58,4 +61,4 @@ if __name__ == '__main__':
     start_crawl(data.story_name)
 
 
-'''Note: run this code using cmd: python3 -m test.cho_hoang_va_xuong'''
+'''Note: run this code using cmd: python3 test/cho_hoang_va_xuong.py'''
