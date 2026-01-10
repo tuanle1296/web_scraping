@@ -42,4 +42,4 @@ if __name__ == '__main__':
 
 
 
-'''Note: run this code using cmd: python3 -m test.nguoi_den_tu_bong_toi_tang_gioi'''
+'''Note: run this code using cmd: python3 test/nguoi_den_tu_bong_toi_tang_gioi.py'''

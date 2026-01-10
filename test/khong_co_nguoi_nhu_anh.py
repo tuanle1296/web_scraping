@@ -47,4 +47,4 @@ if __name__ == '__main__':
     crawl_truyen("Khong co nguoi nhu anh")
 
     
-'''Note: run this code using cmd: python3 -m test.khong_co_nguoi_nhu_anh'''
+'''Note: run this code using cmd: python3 test/khong_co_nguoi_nhu_anh.py'''

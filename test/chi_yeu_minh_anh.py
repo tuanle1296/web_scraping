@@ -1,3 +1,6 @@
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dataclasses import dataclass
 import threading
 from src.base_functions import *
@@ -110,4 +113,4 @@ if __name__ == '__main__':
 
 
 
-'''Note: run this code using cmd: python3 -m test.chi_yeu_minh_anh'''
+'''Note: run this code using cmd: python3 test/chi_yeu_minh_anh.py'''

@@ -1,4 +1,6 @@
 import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.base_functions import *
 from src.locators import kethonsailam
 import threading
@@ -207,4 +209,4 @@ if __name__ == '__main__':
         print("=====FINISHED BY USER INTERRUPTION====")
         sys.exit()
 
-'''Note: run this code using cmd: python3 -m test.ket_hon_sai_lam'''
+'''Note: run this code using cmd: python3 test/ket_hon_sai_lam.py'''
