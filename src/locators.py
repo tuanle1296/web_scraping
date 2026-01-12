@@ -150,3 +150,12 @@ class dung_ai_noi_voi_anh_ay_toi_con_yeu:
     chap_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chap_header : tuple[By, str] = (By.CSS_SELECTOR, "header.entry-header")
+
+@dataclass()
+class co_chap:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "ul.list-chapter")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "a.chapter-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
+    
+    

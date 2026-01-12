@@ -19,7 +19,8 @@ class base(object):
     def __init__(self, is_headless_mode=True, timeout=5):
         options = webdriver.ChromeOptions()
         options.add_argument('--deny-permission-prompts')
-        options.headless = is_headless_mode
+        if is_headless_mode:
+            options.add_argument('--headless=new')
         self.driver = webdriver.Chrome(options=options)
         self.path = None
         self.timeout = timeout
