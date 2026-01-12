@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Debug buc_tuong_doi_mat_dau_goi",
+            "name": "Python: Debug co_chap",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/test/buc_tuong_doi_mat_dau_goi.py",
+            "program": "${workspaceFolder}/test/co_chap.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}"
