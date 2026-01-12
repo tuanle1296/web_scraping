@@ -144,3 +144,9 @@ class buc_tuong_doi_mat_dau_goi:
     invalid_password_message : tuple[By, str] = (By.CSS_SELECTOR, ".post-password-form-invalid-password")
     chap_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
     chap_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+
+@dataclass()
+class dung_ai_noi_voi_anh_ay_toi_con_yeu:
+    chap_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chap_header : tuple[By, str] = (By.CSS_SELECTOR, "header.entry-header")
