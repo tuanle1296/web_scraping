@@ -165,4 +165,8 @@ class suong_mo_tren_dao_hong_kong:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
 
     
-    
+@dataclass
+class ba_nam_roi_lai_ba_nam:
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
