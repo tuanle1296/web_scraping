@@ -170,3 +170,11 @@ class ba_nam_roi_lai_ba_nam:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+
+@dataclass
+class hao_mon_kinh_mong_3_dung_de_lo_nhau:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "ul.list-chapter")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "a.chapter-title")
+    
