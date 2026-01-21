@@ -198,3 +198,9 @@ class bon_thang_yeu_chua_du:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.page-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.content.gs-book")
+
+@dataclass()
+class thich:
+    chap_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.post-title")
