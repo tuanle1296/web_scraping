@@ -41,10 +41,6 @@ class base(object):
         except:
             return False
 
-    def count_elements(self, element):
-        length = WebDriverWait(self.driver, self.timeout).until(EC.presence_of_all_elements_located(element))
-        return len(length)
-
     def capture_screen(self, name):
         s = lambda x: self.driver.execute_script('return document.body.parentNode.scroll' + x)
         self.driver.set_window_size(s('Width'), s('Height'))  # May need manual adjustment
@@ -77,12 +73,17 @@ class base(object):
         return url
 
     def click_element(self, element):
-        WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).click()
+        if isinstance(element, WebElement):
+            WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).click()
+        elif isinstance(element, tuple):
+            WebDriverWait(self.driver, self.timeout).until(EC.presence_of_element_located(element)).click()
+        else:
+            raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
     def reload_current_page(self):
         self.driver.refresh()
 
-    def get_page_source(self):
+    def get_page_source(self) -> str:
         source = self.driver.page_source
         return source
 
@@ -174,10 +175,6 @@ class base(object):
         self.driver.switch_to.window(new_handle)
         self.driver.get(url)
 
-    def count_number_of_tabs(self):
-        length = len(self.driver.window_handles)
-        return length
-
     def switch_tab(self, tab_number):
         self.driver.switch_to.window(self.driver.window_handles[tab_number])
 
@@ -212,10 +209,26 @@ class base(object):
         return data
 
     @staticmethod
-    def crawl_data(url):
-        req = requests.get(url)
-        soup = BeautifulSoup(req.content, "html.parser")
-        return soup
+    def crawl_data(url) -> BeautifulSoup | None:
+        headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5'
+            }
+        response = requests.get(url, headers=headers, timeout=20)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, "html.parser")
+            return soup
+        else:
+            print(f"Page {url} returned status {response.status_code}. Skipping.")
+            return None
+    
+    def crawl_text_from_soup(self, soup: BeautifulSoup, css_locator) -> str:
+        element = soup.select_one(css_locator)
+        if element:
+            return self.get_element_text(element)
+        return ""
+
 
     def save_doc(self, title, body) -> None:
         document = docx.Document()
