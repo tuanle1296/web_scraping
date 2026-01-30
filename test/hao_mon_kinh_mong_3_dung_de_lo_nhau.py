@@ -20,59 +20,21 @@ def crawl_worker(chapter_data, folder_name):
         pass
     crawl.quit_driver()  # Close browser immediately as we use API for crawling
 
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
 
     failed_chapters = []
     for chap_url, chap_num in chapter_data:
         try:
             print(f"Crawling: {chap_url}")
-            response = requests.get(chap_url, headers=headers, timeout=20)
-            if response.status_code == 200:
-                soup = BeautifulSoup(response.content, "html.parser")
-                title_element = soup.select_one(lo.chapter_title[1])
-                content_element = soup.select_one(lo.chapter_content[1])
-                
-                if title_element and content_element:
-                    title = title_element.get_text().strip()
-                    content = content_element.get_text(separator='\n', strip=True)
-                    crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
-                else:
-                    print(f"Elements not found for {chap_url}")
-                    failed_chapters.append((chap_url, chap_num))
-            else:
-                print(f"Page {chap_url} returned status {response.status_code}. Skipping.")
-                failed_chapters.append((chap_url, chap_num))
+            soup = crawl.crawl_data(chap_url)
+            title = crawl.crawl_text_from_soup(soup, lo.chapter_title[1])
+            content = crawl.crawl_text_from_soup(soup, lo.chapter_content[1])
+            crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
         except Exception as e:
             failed_chapters.append((chap_url, chap_num))
-            print(f"====== Warning: Error crawling {chap_url}")
+            print(f"====== Warning: Error crawling {chap_url}", e)
 
     if failed_chapters:
         print(f"Failed chapters in this worker: {failed_chapters}")
-        print("Retrying failed chapters...")
-        for chap_url, chap_num in failed_chapters:
-            try:
-                print(f"Crawling: {chap_url}")
-                response = requests.get(chap_url, headers=headers, timeout=20)
-                if response.status_code == 200:
-                    soup = BeautifulSoup(response.content, "html.parser")
-                    title_element = soup.select_one(lo.chapter_title[1])
-                    content_element = soup.select_one(lo.chapter_content[1])
-                    
-                    if title_element and content_element:
-                        title = title_element.get_text().strip()
-                        content = content_element.get_text(separator='\n', strip=True)
-                        crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
-                    else:
-                        print(f"Elements not found for {chap_url}")
-                        failed_chapters.append((chap_url, chap_num))
-                else:
-                    print(f"Page {chap_url} returned status {response.status_code}. Skipping.")
-                    failed_chapters.append((chap_url, chap_num))
-            except Exception as e:
-                failed_chapters.append((chap_url, chap_num))
-                print(f"====== Final error: Error crawling {chap_url}")
 
 
 
@@ -123,4 +85,4 @@ def main(folder_name):
 if __name__ == '__main__':
     main("hao_mon_kinh_mong_3_dung_de_lo_nhau")
 
-'''Note: run this code using cmd: python3 test/hao_mon_kinh_mong_3_dung_de_lo_nhau.py'''
+'''Note: run this code using cmd: uv run test/hao_mon_kinh_mong_3_dung_de_lo_nhau.py'''

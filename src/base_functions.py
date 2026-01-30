@@ -223,10 +223,11 @@ class base(object):
             print(f"Page {url} returned status {response.status_code}. Skipping.")
             return None
     
-    def crawl_text_from_soup(self, soup: BeautifulSoup, css_locator) -> str:
+    @staticmethod
+    def crawl_text_from_soup(soup: BeautifulSoup, css_locator) -> str:
         element = soup.select_one(css_locator)
         if element:
-            return self.get_element_text(element)
+            return element.text.strip()
         return ""
 
 
