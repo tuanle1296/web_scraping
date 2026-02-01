@@ -227,7 +227,7 @@ class base(object):
     def crawl_text_from_soup(soup: BeautifulSoup, css_locator) -> str:
         element = soup.select_one(css_locator)
         if element:
-            return element.text.strip()
+            return element.get_text(separator='\n', strip=True)
         return ""
 
 
@@ -239,7 +239,10 @@ class base(object):
             document.save(os.path.join(self.path, str(title.get_text()) + ".docx"))
         except:
             document.add_heading(title.text)
-            document.add_paragraph(body.get_text(separator='\n', strip=True))
+            if hasattr(body, 'get_text'):
+                document.add_paragraph(body.get_text(separator='\n', strip=True))
+            else:
+                document.add_paragraph(body.text)
             document.save(os.path.join(self.path, str(title.text) + ".docx"))
 
     @staticmethod
