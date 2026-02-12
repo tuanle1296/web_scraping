@@ -224,3 +224,9 @@ class thuyen_cua_tay_giang_cuu_nguyet_hi:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "a.chapter-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
+
+@dataclass
+class banh_rang:
+    chap_list : tuple[By, str] = (By.XPATH, "//a[contains(text(), 'Chương')]")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
