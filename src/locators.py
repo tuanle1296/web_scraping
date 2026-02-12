@@ -233,8 +233,6 @@ class canh_dong_hoang_vu:
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
 
-    
-
 @dataclass
 class banh_rang:
     chap_list : tuple[By, str] = (By.XPATH, "//a[contains(text(), 'Chương')]")
