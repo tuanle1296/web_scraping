@@ -162,8 +162,10 @@ class base(object):
 
     def input_text(self, element, text):
         if isinstance(element, WebElement):
+            element.clear()
             element.send_keys(text)
         elif isinstance(element, tuple):
+            self.find_element(element).clear()
             self.find_element(element).send_keys(text)
         else:
             raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")

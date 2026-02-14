@@ -238,3 +238,20 @@ class banh_rang:
     chap_list : tuple[By, str] = (By.XPATH, "//a[contains(text(), 'Chương')]")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
+
+@dataclass
+class ngo_cu_tinh_sau:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, ".mvd-san-pham-show-danh-sach-chuong")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title-text")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".msv-khung-truyen-noi-dung.doc-quyen")
+    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, ".password-input")
+    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button.password-submit-btn")
+
+@dataclass
+class trang_sang_ngan_van_dam:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table.is-style-stripes")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+
