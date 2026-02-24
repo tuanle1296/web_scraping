@@ -255,3 +255,10 @@ class trang_sang_ngan_van_dam:
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
 
+@dataclass
+class sa_doa:
+    chapter_list_button : tuple[By, str] = (By.XPATH, "//button[@role='tab' and contains(text(), 'Danh sách chương')]")
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "a.p-2")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.text-2xl")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.bg-white.p-6")
+
