@@ -262,3 +262,9 @@ class sa_doa:
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.text-2xl")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.bg-white.p-6")
 
+@dataclass()
+class doa_hoa_toi_loi:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "ul.list-chapter")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "a.chapter-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
