@@ -277,3 +277,17 @@ class lo_hen_cung_xuan:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
+
+@dataclass
+class bo_tat_dien:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table.is-style-stripes")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+
+@dataclass
+class jolina_land:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.container")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
