@@ -89,8 +89,8 @@ class hoa_hon:
 
 @dataclass()
 class khi_gio_noi_len:
-    header : str = "entry-title"
-    content : str = "entry-content"
+    header : tuple[By, str] = (By.CSS_SELECTOR, ".entry-title")
+    content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
     list_chap : tuple[By, str] = (By.CSS_SELECTOR, ".has-text-align-center")
     chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
 
