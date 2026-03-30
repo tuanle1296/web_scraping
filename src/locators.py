@@ -291,3 +291,10 @@ class jolina_land:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+
+@dataclass()
+class dam_lay_mua_xuan:
+    header : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
+    content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+    list_chap : tuple[By, str] = (By.CSS_SELECTOR, "p.has-text-align-center")
+    chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
