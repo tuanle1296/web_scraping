@@ -298,3 +298,17 @@ class dam_lay_mua_xuan:
     content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
     list_chap : tuple[By, str] = (By.CSS_SELECTOR, "p.has-text-align-center")
     chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
+
+@dataclass
+class co_huong_thao:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "ul.list-chapter")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "a.chapter-title")
+
+@dataclass
+class mot_ngay_mua:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "ul.list-chapter")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "a.chapter-title")
