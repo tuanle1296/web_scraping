@@ -334,8 +334,10 @@ class sac_mau_am:
 class khach_tro:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#chapterContentEncoded")
-    # chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "li.name-breadcum")
+    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input#passwordInput")
+    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button[type='submit']")
 
 @dataclass
 class say_dam:
@@ -1585,3 +1587,10 @@ class gio_dang_noi_dau:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "a.chapter-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
+
+@dataclass
+class buoc_vao_giac_mong_ca_vang:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")

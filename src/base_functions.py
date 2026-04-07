@@ -267,11 +267,19 @@ class base(object):
         document = docx.Document()
         try:
             document.add_heading(title)
-            document.add_paragraph(text)
-            if (file_name):
+            
+            # --- BẢN VÁ: TÁCH TỪNG DÒNG ĐỂ LƯU VÀO DOCX ---
+            # Tránh lỗi python-docx dồn tất cả thành 1 cục và phá hủy dấu xuống dòng
+            lines = text.split('\n')
+            for line in lines:
+                if line.strip():  # Chỉ thêm Paragraph nếu dòng đó thực sự có chữ
+                    document.add_paragraph(line.strip())
+            
+            if file_name:
                 document.save(os.path.join(self.path, file_name + ".docx"))
             else:
                 document.save(os.path.join(self.path, title + ".docx"))
+                
         except Exception as e:
             raise Exception(f"Exception while adding text to or saving doc file '{file_name or title}'.", e)
         
@@ -346,22 +354,83 @@ class base(object):
                 raw_text = target_element.get_attribute("textContent")
                 return raw_text.strip() if raw_text else ""
             else:
-                raw_html = target_element.get_attribute("outerHTML")
-                if not raw_html:
-                    return ""
-                    
-                soup = BeautifulSoup(raw_html, 'html.parser')
+                # ========================================================
+                # BỘ QUÉT VĂN BẢN (TEXT SCANNER) MÔ PHỎNG MẮT NGƯỜI
+                # ========================================================
+                js_script = """
+                var target = arguments[0];
                 
-                # --- VŨ KHÍ MỚI: DÙNG REGEX ĐỂ QUÉT CSS ---
-                # Biểu thức này bắt mọi loại: font-size: 0, font-size: 0px, font-size:0pt, display:none, visibility:hidden
-                hidden_pattern = re.compile(r'(font-size:\s*0[a-z]*|display:\s*none|visibility:\s*hidden)', re.IGNORECASE)
-                
-                # Tìm TẤT CẢ các thẻ (không chỉ span) có chứa style tàng hình
-                for hidden_tag in soup.find_all(style=hidden_pattern):
-                    hidden_tag.decompose() # Băm nát thẻ rác
+                function extractText(node) {
+                    // BƯỚC 1: XỬ LÝ TEXT NODE THUẦN TÚY (Chữ nằm giữa các thẻ)
+                    if (node.nodeType === 3) { 
+                        var parentStyle = window.getComputedStyle(node.parentNode);
+                        // Bỏ qua chữ nếu thẻ cha đang tàng hình hoặc font-size = 0
+                        if (parseFloat(parentStyle.fontSize) === 0 || 
+                            parentStyle.display === 'none' || 
+                            parentStyle.visibility === 'hidden' || 
+                            parentStyle.opacity === '0' ||
+                            parentStyle.color === 'rgba(0, 0, 0, 0)' ||
+                            parentStyle.color === 'transparent') {
+                            return "";
+                        }
+                        return node.nodeValue;
+                    }
                     
-                clean_text = soup.get_text(separator='\n', strip=True)
-                return clean_text
+                    // BƯỚC 2: XỬ LÝ ELEMENT NODE (Các thẻ div, p, span...)
+                    if (node.nodeType === 1) { 
+                        var style = window.getComputedStyle(node);
+                        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+                            return "";
+                        }
+                        
+                        var text = "";
+                        
+                        // Xử lý thẻ xuống dòng <br> và thẻ khối (p, div) để tách đoạn
+                        if (node.tagName === 'BR' || style.display === 'block' || node.tagName === 'P') {
+                            text += "\\n";
+                        }
+                        
+                        // LẤY CHỮ BỊ GIẤU TRONG CSS ::before
+                        var before = window.getComputedStyle(node, '::before');
+                        if (before && before.content && before.content !== 'none' && before.content !== 'normal') {
+                            if (parseFloat(before.fontSize) > 0 && before.opacity !== '0') {
+                                // Xóa dấu nháy kép (") bọc quanh chữ của CSS content
+                                text += before.content.replace(/^["']|["']$/g, '');
+                            }
+                        }
+                        
+                        // Đi sâu vào đọc tiếp các thẻ con bên trong
+                        for (var i = 0; i < node.childNodes.length; i++) {
+                            text += extractText(node.childNodes[i]);
+                        }
+                        
+                        // LẤY CHỮ BỊ GIẤU TRONG CSS ::after
+                        var after = window.getComputedStyle(node, '::after');
+                        if (after && after.content && after.content !== 'none' && after.content !== 'normal') {
+                            if (parseFloat(after.fontSize) > 0 && after.opacity !== '0') {
+                                text += after.content.replace(/^["']|["']$/g, '');
+                            }
+                        }
+                        
+                        return text;
+                    }
+                    return "";
+                }
+                
+                var result = extractText(target);
+                
+                // BƯỚC 3: LÀM SẠCH VĂN BẢN
+                // Xóa khoảng trắng thừa giữa các từ nhưng vẫn giữ nguyên các dấu xuống dòng
+                result = result.replace(/\\r/g, '')
+                               .replace(/[ \\t]+/g, ' ')
+                               .replace(/\\n\\s+/g, '\\n')
+                               .replace(/\\n{3,}/g, '\\n\\n');
+                               
+                return result.trim();
+                """
+                
+                clean_text = self.driver.execute_script(js_script, target_element)
+                return clean_text if clean_text else ""
 
         except StaleElementReferenceException:
             print("Cảnh báo: Element đã bị thay đổi (Stale).")
