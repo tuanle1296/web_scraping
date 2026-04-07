@@ -3,7 +3,7 @@ import os
 import threading
 import math
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from src.seleniumbase_functions import *
+from src.base_functions import *
 from src.locators import khach_tro as lo
 
 
@@ -33,13 +33,17 @@ def crawl_worker(chapter_data, folder_name):
 
             print(f"Crawling: {chap_url}")
             
-            crawl.driver.uc_open_with_reconnect(chap_url, reconnect_time=4)
+            crawl.go_to_webpage(chap_url)
+            crawl.wait_for_page_load(10)
             crawl.sleep(3)
 
             if crawl.is_element_visible(lo.password_input_field):
                 crawl.input_text(lo.password_input_field, password)
                 crawl.sleep(2)
-                crawl.action_click(lo.password_input_field)
+                crawl.click_element(lo.password_submit_btn, force_js=True)
+                crawl.wait_for_page_load(10)
+                # crawl.sleep(2)
+
                 crawl.sleep(3)
 
 
@@ -95,7 +99,7 @@ def main(folder_name):
 
     # Split into chunks for parallel processing
     # Careful when increasing number of threads, some page might be broken
-    num_threads = 1  # Adjust number of threads as needed
+    num_threads = 2  # Adjust number of threads as needed
     chunk_size = math.ceil(len(indexed_chapters) / num_threads)
     chunks = [indexed_chapters[i:i + chunk_size] for i in range(0, len(indexed_chapters), chunk_size)]
 

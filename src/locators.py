@@ -1601,3 +1601,12 @@ class xin_em_o_lai_ben_anh:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.truyen")
+
+@dataclass
+class cung_em_ngam_sao:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p[class='has-text-align-center wp-block-paragraph']")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
+    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")

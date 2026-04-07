@@ -8,7 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import ElementClickInterceptedException, StaleElementReferenceException, TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import requests
@@ -88,13 +88,60 @@ class base(object):
         url = self.driver.current_url
         return url
 
-    def click_element(self, element):
-        if isinstance(element, WebElement):
-            WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).click()
-        elif isinstance(element, tuple):
-            WebDriverWait(self.driver, self.timeout).until(EC.presence_of_element_located(element)).click()
-        else:
-            raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
+    def click_element(self, element: Union[WebElement, Tuple[str, str]], force_js: bool = False) -> bool:
+        """
+        Click an toàn cho Selenium thuần. Tự động cuộn chuột và xử lý lỗi quảng cáo che lấp.
+        
+        Args:
+            element: Đối tượng WebElement hoặc Tuple bộ định vị (vd: (By.ID, "submit-btn")).
+            force_js: Nếu True, bỏ qua giao diện và ép click bằng Javascript.
+        """
+        try:
+            target_element = element
+            
+            # 1. TÌM VÀ CHỜ ELEMENT XUẤT HIỆN TRONG HTML
+            if isinstance(element, tuple):
+                target_element = WebDriverWait(self.driver, self.timeout).until(
+                    EC.presence_of_element_located(element)
+                )
+                
+            if not isinstance(target_element, WebElement):
+                raise TypeError("Đầu vào bắt buộc phải là (By, str) tuple hoặc WebElement.")
+
+            # 2. CUỘN MÀN HÌNH ĐẾN ELEMENT (Đưa nút bấm ra giữa màn hình)
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", target_element)
+
+            # 3. THỰC THI CLICK
+            if force_js:
+                # Ép click đâm xuyên bằng Javascript
+                self.driver.execute_script("arguments[0].click();", target_element)
+            else:
+                # Đợi nút sẵn sàng (không bị disabled/mờ) rồi mới click vật lý
+                WebDriverWait(self.driver, self.timeout).until(
+                    EC.element_to_be_clickable(target_element)
+                )
+                target_element.click()
+                
+            return True
+
+        # 4. CHẾ ĐỘ CỨU HỘ TỰ ĐỘNG (FALLBACK)
+        except ElementClickInterceptedException:
+            # Xảy ra khi nút bị popup/banner quảng cáo đè lên
+            print("Cảnh báo: Element bị che mất. Đang dùng JS Click để cứu hộ...")
+            self.driver.execute_script("arguments[0].click();", target_element)
+            return True
+            
+        except TimeoutException:
+            print(f"Lỗi: Quá {self.timeout}s không tìm thấy nút, hoặc nút không thể click.")
+            return False
+            
+        except StaleElementReferenceException:
+            print("Cảnh báo: Element đã bị DOM load lại làm mất kết nối (Stale).")
+            return False
+            
+        except Exception as e:
+            print(f"Lỗi không xác định khi click: {e}")
+            return False
 
     def reload_current_page(self):
         self.driver.refresh()
