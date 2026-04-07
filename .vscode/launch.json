@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Debug thich",
+            "name": "Python: Debug nam_thu_hai_sau_khi_ket_hon",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/test/thich.py",
+            "program": "${workspaceFolder}/test/nam_thu_hai_sau_khi_ket_hon.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}"

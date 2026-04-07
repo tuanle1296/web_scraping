@@ -1,16 +1,21 @@
+import base64
 import pathlib
-from typing import Tuple, Optional, List
+import re
+from typing import Tuple, Optional, List, Union
 import docx
 import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import requests
 from selenium.webdriver.common.keys import Keys
+import pytesseract
+from PIL import Image
+import io
 import os
 
 
@@ -225,6 +230,9 @@ class base(object):
     
     @staticmethod
     def crawl_text_from_soup(soup: BeautifulSoup, css_locator) -> str:
+        for hidden_span in soup.find_all('span', style=lambda value: value and 'font-size:0' in value.replace(' ', '')):
+            # Hàm decompose() sẽ xóa thẻ này và toàn bộ chữ rác bên trong nó khỏi soup
+            hidden_span.decompose()
         element = soup.select_one(css_locator)
         if element:
             return element.get_text(separator='\n', strip=True)
@@ -318,15 +326,120 @@ class base(object):
             elements = self.driver.find_elements(locator_strategy, locator_value)
         return elements
         
-    def get_element_text(self, element) -> str:
-        if isinstance(element, WebElement):
-            return element.text.strip()
-        elif isinstance(element, tuple):
-            return self.find_element(element).text.strip()
-        raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
+    # def get_element_text(self, element) -> str:
+    #     if isinstance(element, WebElement):
+    #         return element.text.strip()
+    #     elif isinstance(element, tuple):
+    #         return self.find_element(element).text.strip()
+    #     raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
+
+    def get_element_text(self, element: Union[WebElement, Tuple[str, str]], extract_hidden: bool = False) -> str:
+        try:
+            target_element = element
+            if isinstance(element, tuple):
+                target_element = self.find_element(element)
+                
+            if not isinstance(target_element, WebElement):
+                raise TypeError("Đầu vào bắt buộc phải là (By, str) tuple hoặc WebElement.")
+
+            if extract_hidden:
+                raw_text = target_element.get_attribute("textContent")
+                return raw_text.strip() if raw_text else ""
+            else:
+                raw_html = target_element.get_attribute("outerHTML")
+                if not raw_html:
+                    return ""
+                    
+                soup = BeautifulSoup(raw_html, 'html.parser')
+                
+                # --- VŨ KHÍ MỚI: DÙNG REGEX ĐỂ QUÉT CSS ---
+                # Biểu thức này bắt mọi loại: font-size: 0, font-size: 0px, font-size:0pt, display:none, visibility:hidden
+                hidden_pattern = re.compile(r'(font-size:\s*0[a-z]*|display:\s*none|visibility:\s*hidden)', re.IGNORECASE)
+                
+                # Tìm TẤT CẢ các thẻ (không chỉ span) có chứa style tàng hình
+                for hidden_tag in soup.find_all(style=hidden_pattern):
+                    hidden_tag.decompose() # Băm nát thẻ rác
+                    
+                clean_text = soup.get_text(separator='\n', strip=True)
+                return clean_text
+
+        except StaleElementReferenceException:
+            print("Cảnh báo: Element đã bị thay đổi (Stale).")
+            return ""
+        except Exception as e:
+            print(f"Lỗi không xác định khi lấy text: {e}")
+            return ""
 
     def close_browser(self):
         self.driver.close()
 
     def quit_driver(self):
         self.driver.quit()
+
+    def get_content_fast(url, element, expected_attribute):
+        # 1. Tải HTML tĩnh về 
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # 2. Tìm thẻ chứa chuỗi mã hóa bằng CSS Selector
+        # Thay vì soup.find('div', id='chapterContentEncoded')
+        # Dùng thẻ div kết hợp với dấu # để chỉ định ID
+        encoded_div = soup.select_one(element) 
+        
+        # Mẹo nhỏ: Bạn có thể viết ngắn gọn hơn nữa là soup.select_one('#chapterContentEncoded') 
+        
+        if encoded_div and expected_attribute in encoded_div.attrs:
+            encoded_string = encoded_div[expected_attribute]
+            
+            # 3. Dùng Python giải mã Base64 thành HTML gốc
+            decoded_bytes = base64.b64decode(encoded_string)
+            decoded_html = decoded_bytes.decode('utf-8')
+            
+            # 4. Lọc bỏ các thẻ HTML để lấy Text thuần
+            clean_text = BeautifulSoup(decoded_html, 'html.parser').get_text(separator='\n')
+            return clean_text
+        else:
+            return "No content found."
+        
+    def extract_images_to_file(self, elements: List[WebElement], file_name: str):
+        """
+        Cuộn đến từng ảnh trong danh sách truyền vào, quét OCR và lưu nối tiếp vào file.
+        
+        Args:
+            elements (List[WebElement]): Danh sách các thẻ chứa ảnh cần quét.
+            file_path (str): Đường dẫn/Tên file text để lưu kết quả.
+        """
+        if not elements:
+            print("Danh sách thẻ (elements) truyền vào đang trống! Không có gì để quét.")
+            return
+
+        print(f"Bắt đầu quét {len(elements)} bức ảnh và lưu vào: {file_name}")
+        file_path = os.path.join(self.path, file_name + ".docx")
+
+        # Mở file ở chế độ "a" (Append)
+        with open(file_path, "a", encoding="utf-8") as file:
+            
+            for index, img in enumerate(elements, start=1):
+                try:
+                    # Cuộn màn hình đến vị trí bức ảnh
+                    self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", img)
+                    time.sleep(1.5) # Đợi Lazy-load
+                    
+                    # Chụp ảnh và mở bằng Pillow
+                    image_bytes = img.screenshot_as_png
+                    image = Image.open(io.BytesIO(image_bytes))
+                    
+                    # Gọi Tesseract
+                    print(f"Đang dịch ảnh {index}/{len(elements)}...")
+                    text = pytesseract.image_to_string(image, lang='vie')
+                    
+                    # Ghi vào file
+                    if text.strip():
+                        file.write(text.strip() + "\n\n")
+                        file.flush() 
+                        
+                except Exception as e:
+                    print(f"Lỗi ở ảnh thứ {index}: {e}")
+                    file.write(f"\n[Lỗi không đọc được ảnh {index}]\n\n")
+
+        print("\nHOÀN THÀNH! Toàn bộ nội dung đã được lưu.")
