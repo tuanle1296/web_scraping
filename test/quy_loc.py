@@ -1,0 +1,107 @@
+import sys
+import os
+import threading
+import math
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from src.base_functions import *
+from src.locators import quy_loc as lo
+
+def crawl_worker(chapter_data, folder_name):
+    """
+    Worker function to process a chunk of chapters.
+    chapter_data: list of tuples (url, chapter_number)
+    """
+    crawl = base(False)
+    try:
+        crawl.create_folder(folder_name)
+    except:
+        pass
+    passwords = "ChauLoc"
+    
+    for chap_url, chap_num in chapter_data:
+        try:
+            print(f"Crawling: {chap_url}")
+            crawl.go_to_webpage(chap_url)
+            crawl.wait_for_page_load(10)
+
+            if crawl.is_element_visible(lo.password_input_field):
+                print(f"Password field found for Chap {chap_num}. Trying passwords...")
+                crawl.scroll_into_view(lo.password_input_field)
+                crawl.input_text(lo.password_input_field, passwords)
+                crawl.scroll_into_view(lo.password_submit_btn)
+                crawl.click_element(lo.password_submit_btn)
+                crawl.sleep(5)
+                crawl.wait_for_page_load(10)
+                if crawl.is_element_visible(lo.password_input_field) is False:
+                        print(f"Password field not found for Chap {chap_num}.") 
+                    
+            print(f"Crawling: {chap_url}")
+            title = crawl.get_element_text(lo.chapter_title)
+            content = crawl.get_element_text(lo.chapter_content)
+
+            crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
+        except Exception as e:
+            print(f"====== Warning: Error crawling {chap_url}", e)
+        
+
+    crawl.quit_driver()
+
+        
+
+
+
+def main(folder_name):
+    print("=======Create folder=======")
+    crawl = base(False)
+    try:
+        crawl.create_folder(folder_name)
+        print("=======Created folder successfully======")
+    except Exception as e:
+        print(f"Error creating folder: {e}")
+
+    chapters_list = []
+    forbidden_words = ["relatedposts"]
+
+    main_url = "https://hoaroinuocchaycom.wordpress.com/2021/02/22/edit-quy-loc-tong-cuu-can/"
+    
+    crawl.go_to_webpage(main_url)
+    crawl.wait_for_page_load(10)
+    chap_list = crawl.find_elements(lo.chap_list)
+
+    chapters_list = []
+
+    for chap in chap_list:
+        anchors = crawl.find_elements(lo.a_tag, chap)
+        for anchor in anchors:
+            url = crawl.get_attribute_from_element(anchor, "href")
+            if url and not any(word in url for word in forbidden_words) and (url not in chapters_list):
+                chapters_list.append(url)  
+    crawl.quit_driver()  # Close the initial driver
+
+    # Prepare data: list of (url, chapter_number)
+    indexed_chapters = []
+    for i, url in enumerate(chapters_list):
+        indexed_chapters.append((url, i + 1))
+
+    # Split into chunks for parallel processing
+    # Careful when increasing number of threads, some page might be broken
+    num_threads = 2  # Adjust number of threads as needed
+    chunk_size = math.ceil(len(indexed_chapters) / num_threads)
+    chunks = [indexed_chapters[i:i + chunk_size] for i in range(0, len(indexed_chapters), chunk_size)]
+
+    threads = []
+    print(f"Starting {len(chunks)} threads...")
+    for chunk in chunks:
+        t = threading.Thread(target=crawl_worker, args=(chunk, folder_name))
+        threads.append(t)
+        t.start()
+
+    for t in threads:
+        t.join()
+    print("=======All threads finished=======")
+
+if __name__ == '__main__':
+    main("quy_loc")
+
+'''Note: run this code using cmd: uv run test/quy_loc.py'''
