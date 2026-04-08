@@ -5,7 +5,7 @@ import math
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
-from src.locators import khong852 as lo
+from src.locators import chech_huong as lo
 
 
 def crawl_worker(chapter_data, folder_name):
@@ -13,27 +13,31 @@ def crawl_worker(chapter_data, folder_name):
     Worker function to process a chunk of chapters.
     chapter_data: list of tuples (url, chapter_number)
     """
-    crawl = base()
+    crawl = base(is_headless_mode=True)
     try:
         crawl.create_folder(folder_name)
     except:
         pass
     finally:
         crawl.set_path(folder_name)
-    
-    for chap_url, chap_num in chapter_data:
-        try:
-            print(f"Crawling: {chap_url}")
-            crawl.go_to_webpage(chap_url)
-            crawl.sleep(5)
-            crawl.wait_for_page_load(10)
-            title = crawl.get_element_text(lo.chapter_title)
-            content = crawl.get_element_text(lo.chapter_content)
-            crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
-        except Exception as e:
-            print(f"====== Warning: Error crawling {chap_url}", e)
-        finally:
+    try:
+        for chap_url, chap_num in chapter_data:
+            try:
+                print(f"Crawling: {chap_url}")
+                crawl.go_to_webpage(chap_url)
+                crawl.sleep(3)
+                if (crawl.is_element_visible(lo.age_submit_btn)):
+                    crawl.click_element(lo.age_submit_btn)
+                    crawl.sleep(5)
+                crawl.wait_for_page_load(10)
+                title = crawl.get_element_text(lo.chapter_title)
+                content = crawl.get_element_text(lo.chapter_content)
+                crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
+            except Exception as e:
+                print(f"====== Warning: Error crawling {chap_url}", e)
+    finally:
             crawl.quit_driver()
+        
 
 
 
@@ -48,16 +52,19 @@ def main(folder_name):
         print(f"Error creating folder: {e}")
 
     chapters_list = []
-    for i in range (1, 5):
-        main_url = f"https://mongtruyen.com/0852.html?page={i}"
+    main_url = "https://suonxaochuangot.net/chech-huong/"
     
-        crawl.go_to_webpage(main_url)
-        crawl.wait_for_page_load(10)
-        chap_list = crawl.find_elements(lo.chap_list)
-        for chap in chap_list:
-            anchors = crawl.find_elements(lo.a_tag, chap)
-            for anchor in anchors:
-                chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
+    crawl.go_to_webpage(main_url)
+    crawl.wait_for_page_load(10)
+    crawl.sleep(5)
+    if (crawl.is_element_visible(lo.age_submit_btn)):
+        crawl.click_element(lo.age_submit_btn)
+        crawl.sleep(5)
+    chap_list = crawl.find_elements(lo.chap_list)
+    for chap in chap_list:
+        anchors = crawl.find_elements(lo.a_tag, chap)
+        for anchor in anchors:
+            chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
     crawl.quit_driver()  # Close the initial driver
 
     # Prepare data: list of (url, chapter_number)
@@ -83,6 +90,6 @@ def main(folder_name):
     print("=======All threads finished=======")
 
 if __name__ == '__main__':
-    main("0852")
+    main("chech_huong")
 
-'''Note: run this code using cmd: uv run test/0852.py'''
+'''Note: run this code using cmd: uv run test/chech_huong.py'''
