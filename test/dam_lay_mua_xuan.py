@@ -2,7 +2,7 @@ import sys
 import os
 import math
 
-import concurrent
+import concurrent.futures
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
