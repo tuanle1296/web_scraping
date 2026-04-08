@@ -3,6 +3,7 @@ import re
 from typing import Tuple, Optional, List, Union
 import docx
 import time
+from docx.shared import Inches
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
@@ -366,13 +367,30 @@ class base(object):
     
     @staticmethod
     def crawl_text_from_soup(soup: BeautifulSoup, css_locator: str) -> str:
-        for hidden_span in soup.find_all('span', style=lambda value: value and 'font-size:0' in value.replace(' ', '')):
-            # Hàm decompose() sẽ xóa thẻ này và toàn bộ chữ rác bên trong nó khỏi soup
-            hidden_span.decompose()
+        """Lấy text và giữ nguyên vị trí ảnh bằng Placeholder"""
         element = soup.select_one(css_locator)
-        if element:
-            return element.get_text(separator='\n', strip=True)
-        return ""
+        if not element:
+            return ""
+
+        # 1. Dọn rác tàng hình (Anti-scraping)
+        for hidden_span in element.find_all('span', style=lambda value: value and 'font-size:0' in value.replace(' ', '')):
+            hidden_span.decompose()
+
+        # 2. TÌM VÀ ĐÁNH DẤU ẢNH
+        for img in element.find_all('img'):
+            # Lấy link ảnh (nhiều web dùng data-src để lazyload)
+            src = img.get('src') or img.get('data-src') or img.get('data-original')
+            if src:
+                # Ép kiểu link (nếu web dùng link tương đối dạng //domain.com)
+                if src.startswith("//"):
+                    src = "https:" + src
+                    
+                # Tạo chuỗi đánh dấu thay thế cho thẻ img
+                placeholder = f"\n[IMAGE_MARKER_START]{src}[IMAGE_MARKER_END]\n"
+                img.replace_with(placeholder)
+
+        # 3. Lấy toàn bộ Text (Lúc này ảnh đã biến thành các dòng chữ Marker)
+        return element.get_text(separator='\n', strip=True)
 
 
     def save_doc(self, title, body) -> None:
@@ -402,31 +420,49 @@ class base(object):
     def add_text_to_doc_file(self, title: str, text: str, file_name: Optional[str] = None):
         document = docx.Document()
         try:
-            # 1. Thêm tiêu đề
+            # Thêm tiêu đề
             document.add_heading(title)
             
-            # 2. Xử lý text và giữ nguyên ngắt cảnh
+            # Tách nội dung thành từng dòng
             lines = text.split('\n')
             for line in lines:
                 line = line.strip()
-                if line:
-                    # Nếu dòng có chữ -> Thêm chữ bình thường
-                    document.add_paragraph(line)
-                else:
-                    # Nếu là dòng trống ngắt cảnh -> Thêm một dòng trống nhỏ vào Word
-                    # để giữ cấu trúc đoạn văn của tác giả mà không bị dồn cục
-                    document.add_paragraph("") 
-            
-            # 3. Chuẩn bị tên file an toàn (Sanitize filename)
-            if file_name:
-                safe_name = file_name
-            else:
-                # Loại bỏ các ký tự cấm trong OS: \ / : * ? " < > |
-                safe_name = re.sub(r'[\\/*?:"<>|]', "", title)
-                # Thay thế khoảng trắng thừa hoặc dấu cách thành dấu gạch dưới (tùy chọn cho gọn)
-                safe_name = safe_name.strip()
+                if not line:
+                    document.add_paragraph("") # Giữ khoảng trống ngắt cảnh
+                    continue
                 
-            # 4. Lưu file
+                # KIỂM TRA: DÒNG NÀY LÀ ẢNH HAY CHỮ?
+                if "[IMAGE_MARKER_START]" in line:
+                    # Tách link ảnh ra khỏi marker bằng Regex
+                    # (Phòng trường hợp HTML lồng chữ và ảnh trên cùng 1 dòng)
+                    parts = re.split(r'\[IMAGE_MARKER_START\](.*?)\[IMAGE_MARKER_END\]', line)
+                    
+                    for part in parts:
+                        part = part.strip()
+                        if not part: continue
+                        
+                        # Nếu là link ảnh -> Tải và chèn ảnh
+                        if part.startswith("http"):
+                            try:
+                                res = requests.get(part, timeout=10)
+                                if res.status_code == 200:
+                                    image_stream = io.BytesIO(res.content)
+                                    document.add_picture(image_stream, width=Inches(5.0))
+                                else:
+                                    document.add_paragraph(f"[Không thể tải ảnh minh họa: Lỗi {res.status_code}]")
+                            except Exception:
+                                document.add_paragraph(f"[Mất kết nối khi tải ảnh minh họa]")
+                        
+                        # Nếu là chữ vô tình dính kèm -> Viết chữ bình thường
+                        else:
+                            document.add_paragraph(part)
+                            
+                # Nếu chỉ là dòng chữ bình thường
+                else:
+                    document.add_paragraph(line)
+            
+            # Lưu file an toàn
+            safe_name = file_name if file_name else re.sub(r'[\\/*?:"<>|]', "", title).strip()
             final_path = os.path.join(self.path, safe_name + ".docx")
             document.save(final_path)
             
@@ -538,7 +574,7 @@ class base(object):
                 return raw_text.strip() if raw_text else ""
             else:
                 # ========================================================
-                # BỘ QUÉT VĂN BẢN (TEXT SCANNER) MÔ PHỎNG MẮT NGƯỜI
+                # BỘ QUÉT VĂN BẢN VÀ ẢNH (TEXT & IMAGE SCANNER)
                 # ========================================================
                 js_script = """
                 var target = arguments[0];
@@ -547,7 +583,6 @@ class base(object):
                     // BƯỚC 1: XỬ LÝ TEXT NODE THUẦN TÚY (Chữ nằm giữa các thẻ)
                     if (node.nodeType === 3) { 
                         var parentStyle = window.getComputedStyle(node.parentNode);
-                        // Bỏ qua chữ nếu thẻ cha đang tàng hình hoặc font-size = 0
                         if (parseFloat(parentStyle.fontSize) === 0 || 
                             parentStyle.display === 'none' || 
                             parentStyle.visibility === 'hidden' || 
@@ -559,12 +594,26 @@ class base(object):
                         return node.nodeValue;
                     }
                     
-                    // BƯỚC 2: XỬ LÝ ELEMENT NODE (Các thẻ div, p, span...)
+                    // BƯỚC 2: XỬ LÝ ELEMENT NODE (Các thẻ div, p, span, img...)
                     if (node.nodeType === 1) { 
                         var style = window.getComputedStyle(node);
                         if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
                             return "";
                         }
+                        
+                        // ----------------------------------------------------
+                        // BẢN VÁ: NHẬN DIỆN VÀ ĐÁNH DẤU ẢNH (PLACEHOLDER)
+                        // ----------------------------------------------------
+                        if (node.tagName === 'IMG') {
+                            // node.src trong JS sẽ tự động nối link tương đối thành tuyệt đối
+                            // Nếu web dùng lazyload, fallback sang data-src hoặc data-original
+                            var src = node.src || node.getAttribute('data-src') || node.getAttribute('data-original');
+                            if (src) {
+                                return "\\n[IMAGE_MARKER_START]" + src + "[IMAGE_MARKER_END]\\n";
+                            }
+                            return "";
+                        }
+                        // ----------------------------------------------------
                         
                         var text = "";
                         
@@ -577,7 +626,6 @@ class base(object):
                         var before = window.getComputedStyle(node, '::before');
                         if (before && before.content && before.content !== 'none' && before.content !== 'normal') {
                             if (parseFloat(before.fontSize) > 0 && before.opacity !== '0') {
-                                // Xóa dấu nháy kép (") bọc quanh chữ của CSS content
                                 text += before.content.replace(/^["']|["']$/g, '');
                             }
                         }
@@ -603,7 +651,6 @@ class base(object):
                 var result = extractText(target);
                 
                 // BƯỚC 3: LÀM SẠCH VĂN BẢN
-                // Xóa khoảng trắng thừa giữa các từ nhưng vẫn giữ nguyên các dấu xuống dòng
                 result = result.replace(/\\r/g, '')
                                .replace(/[ \\t]+/g, ' ')
                                .replace(/\\n\\s+/g, '\\n')
