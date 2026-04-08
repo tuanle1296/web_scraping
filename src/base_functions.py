@@ -34,7 +34,8 @@ class base(object):
                 uc=True,
                 headless=is_headless_mode,
                 no_sandbox=True,
-                page_load_strategy="eager"
+                page_load_strategy="eager",
+                window_size="1920,1080"
                
             )
         else:
@@ -49,6 +50,7 @@ class base(object):
             options.page_load_strategy = 'eager'
             options.add_argument('--disable-dev-shm-usage') 
             options.add_argument('--no-sandbox')
+            options.add_argument('--window-size=1920,1080')
                 
             self.driver = webdriver.Chrome(options=options)
         # Cài đặt Implicit Wait (Chờ tìm Element)
