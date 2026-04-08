@@ -1610,3 +1610,36 @@ class cung_em_ngam_sao:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
+
+@dataclass
+class mot_dong_xu:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
+    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
+
+@dataclass
+class chech_huong:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+    age_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button.age-gate__submit--yes")
+
+@dataclass
+class danh_gia_kem:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+    age_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button.age-gate__submit--yes")
+
+@dataclass
+class ban_cong:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
+    age_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button.age-gate__submit--yes")

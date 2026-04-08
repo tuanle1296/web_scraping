@@ -1,4 +1,5 @@
 import pathlib
+import re
 from typing import Tuple, Optional, List, Union
 import docx
 import time
@@ -32,7 +33,8 @@ class base(object):
             self.driver = Driver(
                 uc=True,
                 headless=is_headless_mode,
-                no_sandbox=True
+                no_sandbox=True,
+                page_load_strategy="eager"
                
             )
         else:
@@ -44,9 +46,22 @@ class base(object):
             options.add_argument('--deny-permission-prompts')
             if is_headless_mode:
                 options.add_argument('--headless=new')
+            options.page_load_strategy = 'eager'
+            options.add_argument('--disable-dev-shm-usage') 
+            options.add_argument('--no-sandbox')
                 
             self.driver = webdriver.Chrome(options=options)
+        # Cài đặt Implicit Wait (Chờ tìm Element)
         self.driver.implicitly_wait(timeout)
+        
+        # BƯỚC 2: THIẾT QUÂN LUẬT - Không cho phép load trang nào quá 20 giây
+        self.driver.set_page_load_timeout(20)
+
+
+    def set_path(self, folder_name):
+        """Chỉ định thư mục làm việc mà không cần tạo mới (Dành riêng cho đa luồng)"""
+        cur_dir = os.path.abspath(os.getcwd())
+        self.path = os.path.join(cur_dir, folder_name)
 
 
     def create_folder(self, folder_name):
@@ -139,8 +154,24 @@ class base(object):
         file_name = os.path.join(self.path, title + ".png")
         return file_name
 
-    def go_to_webpage(self, url):
-        self.driver.get(url)
+    def go_to_webpage(self, url: str, bypass_cloudflare: bool = False, reconnect_time: int = 4):
+        """
+        Truy cập web. 
+        Nếu bypass_cloudflare = True, sẽ dùng UC Mode để vượt khiên.
+        Nếu bypass_cloudflare = False, sẽ dùng lệnh get() tiêu chuẩn (rất nhanh).
+        """
+        
+        try:
+            # Chỉ ngắt kết nối khi bạn BẬT công tắc và đang xài SeleniumBase
+            if bypass_cloudflare and hasattr(self.driver, "uc_open_with_reconnect"):
+                self.driver.uc_open_with_reconnect(url, reconnect_time=reconnect_time)
+                
+            else:
+                # Truy cập tốc độ cao, dùng lại Cookie đã có
+                self.driver.get(url)
+                
+        except Exception as e:
+            print(f"Error while loading {url}: {e}")
 
     def get_current_url(self):
         url = self.driver.current_url
@@ -369,22 +400,36 @@ class base(object):
     def add_text_to_doc_file(self, title: str, text: str, file_name: Optional[str] = None):
         document = docx.Document()
         try:
+            # 1. Thêm tiêu đề
             document.add_heading(title)
             
-            # --- BẢN VÁ: TÁCH TỪNG DÒNG ĐỂ LƯU VÀO DOCX ---
-            # Tránh lỗi python-docx dồn tất cả thành 1 cục và phá hủy dấu xuống dòng
+            # 2. Xử lý text và giữ nguyên ngắt cảnh
             lines = text.split('\n')
             for line in lines:
-                if line.strip():  # Chỉ thêm Paragraph nếu dòng đó thực sự có chữ
-                    document.add_paragraph(line.strip())
+                line = line.strip()
+                if line:
+                    # Nếu dòng có chữ -> Thêm chữ bình thường
+                    document.add_paragraph(line)
+                else:
+                    # Nếu là dòng trống ngắt cảnh -> Thêm một dòng trống nhỏ vào Word
+                    # để giữ cấu trúc đoạn văn của tác giả mà không bị dồn cục
+                    document.add_paragraph("") 
             
+            # 3. Chuẩn bị tên file an toàn (Sanitize filename)
             if file_name:
-                document.save(os.path.join(self.path, file_name + ".docx"))
+                safe_name = file_name
             else:
-                document.save(os.path.join(self.path, title + ".docx"))
+                # Loại bỏ các ký tự cấm trong OS: \ / : * ? " < > |
+                safe_name = re.sub(r'[\\/*?:"<>|]', "", title)
+                # Thay thế khoảng trắng thừa hoặc dấu cách thành dấu gạch dưới (tùy chọn cho gọn)
+                safe_name = safe_name.strip()
                 
+            # 4. Lưu file
+            final_path = os.path.join(self.path, safe_name + ".docx")
+            document.save(final_path)
+            
         except Exception as e:
-            raise Exception(f"Exception while adding text to or saving doc file '{file_name or title}'.", e)
+            raise Exception(f"Lỗi khi ghi nội dung vào file Word '{file_name or title}': {e}")
         
     @staticmethod
     def sleep(delay_time):

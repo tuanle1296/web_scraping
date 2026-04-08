@@ -5,77 +5,77 @@ import math
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
-from src.locators import cm_anh_duong as lo
+from src.locators import mot_dong_xu as lo
 
 def crawl_worker(chap_data, folder_name):
     """
-    Worker xử lý TỪNG CHƯƠNG MỘT.
+    Worker xử lý TỪNG CHƯƠNG MỘT thay vì cả cục.
     chap_data: tuple (url, chapter_number)
     """
     
+    # Khởi tạo trình duyệt riêng cho từng luồng
     crawl = base()
-    try:
-        crawl.create_folder(folder_name)
-    except:
-        pass
-    finally:
-        crawl.set_path(folder_name)
+    passwords = "motdongxu"
     
+    crawl.set_path(folder_name)
     for chap_url, chap_num in chap_data:
         try:
             print(f"Crawling: {chap_url}")
+            crawl.go_to_webpage(chap_url)
+            crawl.wait_for_page_load(10)
             
-            # Dùng hàm crawl_data (BS4/Requests) của bạn
-            soup = crawl.crawl_data(chap_url)
-            if soup:
-                title = crawl.crawl_text_from_soup(soup, lo.chapter_title[1])
-                content = crawl.crawl_text_from_soup(soup, lo.chapter_content[1])
-                
-                crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
-                return f"Complete chapter: {chap_num}"
-            else:
-                return f"Failed to crawl chapter: {chap_num}"
+            if crawl.is_element_visible(lo.password_input_field):
+                    print(f"Password field found for Chap {chap_num}. Trying passwords...")
+                    crawl.input_text(lo.password_input_field, passwords)
+                    crawl.click_element(lo.password_submit_btn)
+                    crawl.sleep(5)
+                    crawl.wait_for_page_load(10)
+                    if crawl.is_element_visible(lo.password_input_field) is False:
+                            print(f"Password {passwords} is correct for Chap {chap_num}.") 
 
+            title = crawl.get_element_text(lo.chapter_title)
+            content = crawl.get_element_text(lo.chapter_content)
+            crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
+            
+            return f"Completed chapter: {chap_num}"
+            
         except Exception as e:
             print(f"====== Warning: Error crawling {chap_url}: {e}")
-            return f"Error while crawling chapter: {chap_num}"
+            return f"Failed to crawl chapter:{chap_num}"
             
         finally:
-            # BẮT BUỘC: Đóng trình duyệt của luồng này dù code có chạy thành công hay văng lỗi
+            # CHẮC CHẮN 100% TRÌNH DUYỆT SẼ ĐƯỢC ĐÓNG DÙ CÓ LỖI HAY KHÔNG
             crawl.quit_driver()
 
 
 def main(folder_name):
-    print("======= Khởi tạo và gom link =======")
-    crawl = base(False) # Mở trình duyệt có giao diện để gom link nếu cần
+    print("======= Starting =======")
+    crawl = base(False)
     
     try:
         crawl.create_folder(folder_name)
-        print("======= Tạo folder thành công ======")
+        print("======= Created folder successfully ======")
     except Exception as e:
-        print(f"An error occurred while creating folder: {e}")
+        print(f"Error while creating folder: {e}")
 
     chapters_list = []
-    forbidden_words = ["tuy-tien-phong", "rat-nho-rat-nho", "facebook", "tac-gia", "twitter"]
-
+    
     try:
-        main_url = "https://truyen3d.wordpress.com/2017/01/05/1-cm-anh-duong-mac-bao-phi-bao/"
+        main_url = f"https://lamdaunhagau.wordpress.com/hd-dang-edit-mot-dong-xu-quyet-biet/"
         crawl.go_to_webpage(main_url)
         crawl.wait_for_page_load(10)
-        
+            
         chap_list = crawl.find_elements(lo.chap_list)
-        
         for chap in chap_list:
             anchors = crawl.find_elements(lo.a_tag, chap)
             for anchor in anchors:
                 url = crawl.get_attribute_from_element(anchor, "href")
                 
                 # Lọc link chuẩn
-                if url and not any(word in url for word in forbidden_words) and (url not in chapters_list):
+                if url and (url not in chapters_list):
                     chapters_list.append(url)
-                    
     finally:
-        crawl.quit_driver()  # Gom link xong thì đóng ngay trình duyệt của hàm main
+        crawl.quit_driver()  # Đóng trình duyệt gom link
 
     # Prepare data: list of (url, chapter_number)
     indexed_chapters = []
@@ -100,6 +100,6 @@ def main(folder_name):
     print("=======All threads finished=======")
 
 if __name__ == '__main__':
-    main("1cm_anh_duong")
+    main("mot_dong_xu")
 
-'''Note: run this code using cmd: uv run test/1cm_anh_duong.py'''
+'''Note: run this code using cmd: uv run test/mot_dong_xu.py'''
