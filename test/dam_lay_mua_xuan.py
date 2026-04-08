@@ -1,7 +1,8 @@
 import sys
 import os
-import threading
 import math
+
+import concurrent
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
@@ -67,15 +68,10 @@ def main(folder_name):
     chunk_size = math.ceil(len(indexed_chapters) / num_threads)
     chunks = [indexed_chapters[i:i + chunk_size] for i in range(0, len(indexed_chapters), chunk_size)]
 
-    threads = []
     print(f"Starting {len(chunks)} threads...")
-    for chunk in chunks:
-        t = threading.Thread(target=crawl_worker, args=(chunk, folder_name))
-        threads.append(t)
-        t.start()
-
-    for t in threads:
-        t.join()
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+        # Truyền cả chunk_size vào hàm crawl_worker
+        executor.map(lambda chunk: crawl_worker(chunk, folder_name), chunks)
     print("=======All threads finished=======")
 
 if __name__ == '__main__':
