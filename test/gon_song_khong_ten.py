@@ -4,7 +4,7 @@ import threading
 import math
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.seleniumbase_functions import *
+from src.base_functions import *
 from src.locators import gon_song_khong_ten as lo
 
 
@@ -31,7 +31,7 @@ from src.locators import gon_song_khong_ten as lo
 
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False)
+    crawl = base(False, use_seleniumbase=True)
     try:
         crawl.create_folder(folder_name)
         print("=======Created folder successfully======")

@@ -1,6 +1,4 @@
-import base64
 import pathlib
-import re
 from typing import Tuple, Optional, List, Union
 import docx
 import time
@@ -8,7 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import ElementClickInterceptedException, StaleElementReferenceException, TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import requests
@@ -17,18 +15,39 @@ import pytesseract
 from PIL import Image
 import io
 import os
+from seleniumbase import Driver
 
 
 class base(object):
 
-    def __init__(self, is_headless_mode=True, timeout=5):
-        options = webdriver.ChromeOptions()
-        options.add_argument('--deny-permission-prompts')
-        if is_headless_mode:
-            options.add_argument('--headless=new')
-        self.driver = webdriver.Chrome(options=options)
+    def __init__(self, is_headless_mode=True, timeout=5, use_seleniumbase=False):
         self.path = None
         self.timeout = timeout
+
+        if use_seleniumbase:
+            # ---------------------------------------------------------
+            # SELENIUMBASE (By pass Cloudflare, Anti-bot)
+            # ---------------------------------------------------------
+            print("Starting browser with SeleniumBase (UC Mode)...")
+            self.driver = Driver(
+                uc=True,
+                headless=is_headless_mode,
+                no_sandbox=True
+               
+            )
+        else:
+            # ---------------------------------------------------------
+            # SELENIUM
+            # ---------------------------------------------------------
+            print("Starting browser with Selenium...")
+            options = webdriver.ChromeOptions()
+            options.add_argument('--deny-permission-prompts')
+            if is_headless_mode:
+                options.add_argument('--headless=new')
+                
+            self.driver = webdriver.Chrome(options=options)
+        self.driver.implicitly_wait(timeout)
+
 
     def create_folder(self, folder_name):
         cur_dir = os.path.abspath(os.getcwd())
@@ -46,10 +65,60 @@ class base(object):
         except:
             return False
 
-    def capture_screen(self, name):
-        s = lambda x: self.driver.execute_script('return document.body.parentNode.scroll' + x)
-        self.driver.set_window_size(s('Width'), s('Height'))  # May need manual adjustment
-        self.driver.find_element(By.TAG_NAME, 'body').screenshot(name)
+    def capture_full_screen(self, file_name: str):
+        """
+        Chụp ảnh toàn bộ trang web từ đầu đến cuối một cách an toàn.
+        """
+        full_file_path = os.path.join(self.path, f"{file_name}.png")
+        print(f"Capturing full screen to: {full_file_path}")
+        
+        # BƯỚC 1: XỬ LÝ LAZY-LOAD (Bắt buộc)
+        # Phải cuộn từ từ xuống cuối trang để ép web tải toàn bộ ảnh/nội dung ẩn
+        self.scroll_web_page_to_the_end(pause_time=1, max_scrolls=20)
+        
+        # Cuộn ngược lại lên đầu trang để chuẩn bị chụp
+        self.driver.execute_script("window.scrollTo(0, 0);")
+        time.sleep(1) # Đợi các thanh menu cố định (sticky header) thu gọn lại
+
+        try:
+            # BƯỚC 2: CHỤP ẢNH TOÀN TRANG TÙY THEO LOẠI DRIVER
+            
+            # Nếu đang dùng SeleniumBase (Cách xịn nhất, không bị giới hạn OS)
+            if hasattr(self.driver, "save_page_screenshot"):
+                self.driver.save_page_screenshot(full_file_path)
+                print("Completed using SeleniumBase!")
+                
+            # Nếu đang dùng Selenium thuần (Dùng Chrome DevTools Protocol - CDP)
+            else:
+                # Lấy thông số layout thực tế bằng CDP (Vượt qua mọi giới hạn màn hình)
+                metrics = self.driver.execute_cdp_cmd('Page.getLayoutMetrics', {})
+                content_width = metrics['contentSize']['width']
+                content_height = metrics['contentSize']['height']
+                
+                # Gửi lệnh chụp toàn trang ở cấp độ lõi của Chrome
+                screenshot_dict = self.driver.execute_cdp_cmd(
+                    'Page.captureScreenshot', {
+                        'format': 'png',
+                        'captureBeyondViewport': True, # Chụp vượt khỏi màn hình
+                        'clip': {
+                            'width': content_width,
+                            'height': content_height,
+                            'x': 0,
+                            'y': 0,
+                            'scale': 1
+                        }
+                    }
+                )
+                
+                # Lưu file ảnh từ dữ liệu Base64
+                import base64
+                with open(full_file_path, "wb") as f:
+                    f.write(base64.b64decode(screenshot_dict['data']))
+                print("Completed with Chrome CDP!")
+                
+        except Exception as e:
+            print(f"An error occurred while capturing the full screen: {e}")
+
 
     def switch_frame(self, frame_reference):
         """Switch to a frame by WebElement, name, or index."""
@@ -77,13 +146,47 @@ class base(object):
         url = self.driver.current_url
         return url
 
-    def click_element(self, element):
-        if isinstance(element, WebElement):
-            WebDriverWait(self.driver, self.timeout).until(EC.element_to_be_clickable(element)).click()
-        elif isinstance(element, tuple):
-            WebDriverWait(self.driver, self.timeout).until(EC.presence_of_element_located(element)).click()
-        else:
-            raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
+    def click_element(self, element: Union[WebElement, Tuple[str, str]], force_js: bool = False) -> bool:
+        try:
+            target_element = element
+            
+            if isinstance(element, tuple):
+                target_element = WebDriverWait(self.driver, self.timeout).until(
+                    EC.presence_of_element_located(element)
+                )
+                
+            if not isinstance(target_element, WebElement):
+                raise TypeError("Element shoule be (By, str) tuple or WebElement.")
+
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", target_element)
+
+            if force_js:
+                self.driver.execute_script("arguments[0].click();", target_element)
+            else:
+                WebDriverWait(self.driver, self.timeout).until(
+                    EC.element_to_be_clickable(target_element)
+                )
+                target_element.click()
+                
+            return True
+
+        # (FALLBACK)
+        except ElementClickInterceptedException:
+            print("Element is not interactable. Using JS Click to rescue...")
+            self.driver.execute_script("arguments[0].click();", target_element)
+            return True
+            
+        except TimeoutException:
+            print(f"Error: Unable to find or click element within {self.timeout} seconds")
+            return False
+            
+        except StaleElementReferenceException:
+            print("Warning: Element has been stale.")
+            return False
+            
+        except Exception as e:
+            print(f"Unknown error: {e}")
+            return False
 
     def reload_current_page(self):
         self.driver.refresh()
@@ -229,7 +332,7 @@ class base(object):
             return None
     
     @staticmethod
-    def crawl_text_from_soup(soup: BeautifulSoup, css_locator) -> str:
+    def crawl_text_from_soup(soup: BeautifulSoup, css_locator: str) -> str:
         for hidden_span in soup.find_all('span', style=lambda value: value and 'font-size:0' in value.replace(' ', '')):
             # Hàm decompose() sẽ xóa thẻ này và toàn bộ chữ rác bên trong nó khỏi soup
             hidden_span.decompose()
@@ -287,17 +390,37 @@ class base(object):
     def sleep(delay_time):
         time.sleep(delay_time)
 
-    def scroll_web_page_to_the_end(self):
+    def scroll_web_page_to_the_end(self, pause_time=2, max_scrolls=50) -> bool:
+        """
+        Scrolls to the bottom of the page.
+        Returns True if it hit the absolute bottom, False if it hit the max_scrolls limit.
+        """
         last_height = self.driver.execute_script("return document.body.scrollHeight")
+        scroll_count = 0
 
-        while True:
+        while scroll_count < max_scrolls:
+            # Scroll down to bottom
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-            time.sleep(2)  # Adjust based on network/content load speed
+            
+            # Wait to load page
+            time.sleep(pause_time)
 
+            # Calculate new scroll height and compare with last scroll height
             new_height = self.driver.execute_script("return document.body.scrollHeight")
+            
             if new_height == last_height:
-                break
+                # DOUBLE CHECK: Give it one more second to be absolutely sure it's not just a slow network
+                time.sleep(1)
+                new_height_check = self.driver.execute_script("return document.body.scrollHeight")
+                if new_height_check == last_height:
+                    print(f"Reached absolute bottom after {scroll_count} scrolls.")
+                    return True # Signal: Success
+                    
             last_height = new_height
+            scroll_count += 1
+
+        print(f"Warning: Stopped scrolling after hitting the maximum limit of {max_scrolls} scrolls.")
+        return False # Signal: Reached limit before finding the bottom
 
     def is_element_visible(self, element) -> bool:
         if isinstance(element, tuple):
@@ -312,11 +435,31 @@ class base(object):
 
         return web_element.is_displayed()
 
-    def scroll_into_view(self, element):
-        is_visible = self.is_element_visible(element)
-        while not is_visible:
-            self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", element)
-            is_visible = self.is_element_visible(element)
+    def scroll_into_view(self, element) -> bool:
+        """
+        Scrolls the page up or down to center the element.
+        Returns True if the element becomes visible, False otherwise.
+        """
+        try:
+            # 1. Execute the scroll command EXACTLY ONCE
+            self.driver.execute_script(
+                "arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", 
+                element
+            )
+            
+            # 2. Pause briefly to allow the smooth scrolling animation to finish
+            time.sleep(0.8) # Adjust this if the page is very long/slow
+            
+            # 3. Check visibility once after arriving
+            if self.is_element_visible(element):
+                return True
+            else:
+                print("Warning: Scrolled to element, but it is still hidden (e.g., behind a banner or display: none).")
+                return False
+                
+        except Exception as e:
+            print(f"Failed to scroll to element: {e}")
+            return False
 
     def find_element(self, element_, parent_element: Optional[WebElement] = None) -> Optional[WebElement]:
         target = parent_element if parent_element else self.driver
@@ -333,13 +476,6 @@ class base(object):
         else:
             elements = self.driver.find_elements(locator_strategy, locator_value)
         return elements
-        
-    # def get_element_text(self, element) -> str:
-    #     if isinstance(element, WebElement):
-    #         return element.text.strip()
-    #     elif isinstance(element, tuple):
-    #         return self.find_element(element).text.strip()
-    #     raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
     def get_element_text(self, element: Union[WebElement, Tuple[str, str]], extract_hidden: bool = False) -> str:
         try:
@@ -433,10 +569,10 @@ class base(object):
                 return clean_text if clean_text else ""
 
         except StaleElementReferenceException:
-            print("Cảnh báo: Element đã bị thay đổi (Stale).")
+            print("Warning: Element has been stale.")
             return ""
         except Exception as e:
-            print(f"Lỗi không xác định khi lấy text: {e}")
+            print(f"Unknown error: {e}")
             return ""
 
     def close_browser(self):
@@ -445,38 +581,9 @@ class base(object):
     def quit_driver(self):
         self.driver.quit()
 
-    def get_content_fast(url, element, expected_attribute):
-        # 1. Tải HTML tĩnh về 
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        
-        # 2. Tìm thẻ chứa chuỗi mã hóa bằng CSS Selector
-        # Thay vì soup.find('div', id='chapterContentEncoded')
-        # Dùng thẻ div kết hợp với dấu # để chỉ định ID
-        encoded_div = soup.select_one(element) 
-        
-        # Mẹo nhỏ: Bạn có thể viết ngắn gọn hơn nữa là soup.select_one('#chapterContentEncoded') 
-        
-        if encoded_div and expected_attribute in encoded_div.attrs:
-            encoded_string = encoded_div[expected_attribute]
-            
-            # 3. Dùng Python giải mã Base64 thành HTML gốc
-            decoded_bytes = base64.b64decode(encoded_string)
-            decoded_html = decoded_bytes.decode('utf-8')
-            
-            # 4. Lọc bỏ các thẻ HTML để lấy Text thuần
-            clean_text = BeautifulSoup(decoded_html, 'html.parser').get_text(separator='\n')
-            return clean_text
-        else:
-            return "No content found."
-        
     def extract_images_to_file(self, elements: List[WebElement], file_name: str):
         """
-        Cuộn đến từng ảnh trong danh sách truyền vào, quét OCR và lưu nối tiếp vào file.
-        
-        Args:
-            elements (List[WebElement]): Danh sách các thẻ chứa ảnh cần quét.
-            file_path (str): Đường dẫn/Tên file text để lưu kết quả.
+        Cuộn đến từng ảnh, quét OCR và lưu vào file Word (.docx).
         """
         if not elements:
             print("Danh sách thẻ (elements) truyền vào đang trống! Không có gì để quét.")
@@ -485,30 +592,39 @@ class base(object):
         print(f"Bắt đầu quét {len(elements)} bức ảnh và lưu vào: {file_name}")
         file_path = os.path.join(self.path, file_name + ".docx")
 
-        # Mở file ở chế độ "a" (Append)
-        with open(file_path, "a", encoding="utf-8") as file:
-            
-            for index, img in enumerate(elements, start=1):
-                try:
-                    # Cuộn màn hình đến vị trí bức ảnh
-                    self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", img)
-                    time.sleep(1.5) # Đợi Lazy-load
-                    
-                    # Chụp ảnh và mở bằng Pillow
-                    image_bytes = img.screenshot_as_png
-                    image = Image.open(io.BytesIO(image_bytes))
-                    
-                    # Gọi Tesseract
-                    print(f"Đang dịch ảnh {index}/{len(elements)}...")
-                    text = pytesseract.image_to_string(image, lang='vie')
-                    
-                    # Ghi vào file
-                    if text.strip():
-                        file.write(text.strip() + "\n\n")
-                        file.flush() 
-                        
-                except Exception as e:
-                    print(f"Lỗi ở ảnh thứ {index}: {e}")
-                    file.write(f"\n[Lỗi không đọc được ảnh {index}]\n\n")
+        # 1. Khởi tạo Document (Tạo file mới hoặc mở file cũ nếu đã tồn tại)
+        if os.path.exists(file_path):
+            document = docx.Document(file_path)
+        else:
+            document = docx.Document()
+            document.add_heading(f"Dữ liệu quét từ ảnh: {file_name}", level=1)
 
-        print("\nHOÀN THÀNH! Toàn bộ nội dung đã được lưu.")
+        # 2. Vòng lặp xử lý từng ảnh
+        for index, img in enumerate(elements, start=1):
+            try:
+                # Cuộn màn hình đến vị trí bức ảnh
+                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", img)
+                time.sleep(1.5) # Đợi Lazy-load
+                
+                # Chụp ảnh và mở bằng Pillow
+                image_bytes = img.screenshot_as_png
+                image = Image.open(io.BytesIO(image_bytes))
+                
+                # Gọi Tesseract
+                print(f"Đang dịch ảnh {index}/{len(elements)}...")
+                text = pytesseract.image_to_string(image, lang='vie')
+                
+                # Ghi vào Document trong RAM
+                if text.strip():
+                    document.add_paragraph(text.strip())
+                    
+            except Exception as e:
+                print(f"Lỗi ở ảnh thứ {index}: {e}")
+                document.add_paragraph(f"[Lỗi không đọc được ảnh {index}]")
+
+        # 3. Lưu toàn bộ kết quả từ RAM xuống ổ cứng (Chỉ lưu 1 lần cho nhanh)
+        try:
+            document.save(file_path)
+            print(f"\nHOÀN THÀNH! Toàn bộ nội dung đã được lưu chuẩn vào file {file_name}.docx")
+        except Exception as e:
+            print(f"Lỗi khi lưu file DOCX: {e}")
