@@ -8,10 +8,6 @@ from src.base_functions import *
 from src.locators import cm_anh_duong as lo
 
 def crawl_worker(chap_data, folder_name):
-    """
-    Worker xử lý TỪNG CHƯƠNG MỘT.
-    chap_data: tuple (url, chapter_number)
-    """
     
     crawl = base()
     try:
@@ -21,28 +17,29 @@ def crawl_worker(chap_data, folder_name):
     finally:
         crawl.set_path(folder_name)
     
-    for chap_url, chap_num in chap_data:
-        try:
-            print(f"Crawling: {chap_url}")
-            
-            # Dùng hàm crawl_data (BS4/Requests) của bạn
-            soup = crawl.crawl_data(chap_url)
-            if soup:
-                title = crawl.crawl_text_from_soup(soup, lo.chapter_title[1])
-                content = crawl.crawl_text_from_soup(soup, lo.chapter_content[1])
+    try:
+    
+        for chap_url, chap_num in chap_data:
+            try:
+                print(f"Crawling: {chap_url}")
                 
-                crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
-                return f"Complete chapter: {chap_num}"
-            else:
-                return f"Failed to crawl chapter: {chap_num}"
+                # Dùng hàm crawl_data (BS4/Requests) của bạn
+                soup = crawl.crawl_data(chap_url)
+                if soup:
+                    title = crawl.crawl_text_from_soup(soup, lo.chapter_title[1])
+                    content = crawl.crawl_text_from_soup(soup, lo.chapter_content[1])
+                    
+                    crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
+                    return f"Complete chapter: {chap_num}"
+                else:
+                    return f"Failed to crawl chapter: {chap_num}"
 
-        except Exception as e:
-            print(f"====== Warning: Error crawling {chap_url}: {e}")
-            return f"Error while crawling chapter: {chap_num}"
+            except Exception as e:
+                print(f"====== Warning: Error crawling {chap_url}: {e}")
+                return f"Error while crawling chapter: {chap_num}"
             
-        finally:
-            # BẮT BUỘC: Đóng trình duyệt của luồng này dù code có chạy thành công hay văng lỗi
-            crawl.quit_driver()
+    finally:
+        crawl.quit_driver()
 
 
 def main(folder_name):
