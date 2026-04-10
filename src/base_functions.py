@@ -8,7 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import ElementClickInterceptedException, StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, StaleElementReferenceException, TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import requests
@@ -546,10 +546,18 @@ class base(object):
 
     def find_element(self, element_, parent_element: Optional[WebElement] = None) -> Optional[WebElement]:
         target = parent_element if parent_element else self.driver
+        
         if isinstance(element_, tuple):
-            return target.find_element(*element_)
+            try:
+                # Try to find it
+                return target.find_element(*element_)
+            except NoSuchElementException:
+                # If it fails, silently return None
+                return None 
+                
         elif isinstance(element_, WebElement):
-            return element_ # Already a WebElement
+            return element_
+            
         raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
     def find_elements(self, style_tuple: Tuple[By, str], parent_element: Optional[WebElement] = None) -> List[WebElement]:
