@@ -7,3 +7,10 @@ class truyenfullvision:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "a.chapter-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
+
+@dataclass
+class mongtruyen:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
