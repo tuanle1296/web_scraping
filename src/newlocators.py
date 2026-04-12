@@ -25,3 +25,4 @@ class mongtruyen:
     signin_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='dangnhap']")   
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input.password-input")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button#btnSubmitPassword")
+    accept_warning_btn : tuple[By, str] = (By.CSS_SELECTOR, "div.gioi-han-do-tuoi-warning-box a.gioi-han-do-tuoi-btn-continue")

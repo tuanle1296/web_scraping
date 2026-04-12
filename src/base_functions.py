@@ -272,19 +272,21 @@ class base(object):
         except Exception:
             return False
     
-    def wait_for_element_visible(self, element, timeout: Optional[int] = None) -> WebElement | None:
+    def wait_for_element_visible(self, element, timeout: Optional[int] = None) -> bool:
         """Wait until the element is visible and return it."""
         wait_time = timeout if timeout is not None else self.timeout
         if isinstance(element, tuple):
             try:
-                return WebDriverWait(self.driver, wait_time).until(EC.visibility_of_element_located(element))
+                WebDriverWait(self.driver, wait_time).until(EC.visibility_of_element_located(element))
+                return True
             except:
-                return None
+                return False
         elif isinstance(element, WebElement):
             try:
-                return WebDriverWait(self.driver, wait_time).until(EC.visibility_of(element))
+                WebDriverWait(self.driver, wait_time).until(EC.visibility_of(element))
+                return True
             except:
-                return None
+                return False
         raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
     def pass_data_to_file(self, source, file_name):
@@ -509,14 +511,18 @@ class base(object):
         if isinstance(element, tuple):
             try:
                 web_element = self.find_element(element)
+                return web_element.is_displayed()
             except:
                 return False
         elif isinstance(element, WebElement):
-            web_element = element
+            try:
+                web_element = element
+                return web_element.is_displayed()
+            except:
+                return False
         else:
             raise TypeError("Invalid element type. Must be a (By, str) tuple or a WebElement.")
 
-        return web_element.is_displayed()
 
     def scroll_into_view(self, element) -> bool:
         """
