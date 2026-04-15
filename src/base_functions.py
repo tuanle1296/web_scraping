@@ -1,6 +1,6 @@
 import pathlib
 import re
-from typing import Tuple, Optional, List, Union
+from typing import Literal, Tuple, Optional, List, Union
 import docx
 import time
 from docx.shared import Inches
@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 import requests
 from selenium.webdriver.common.keys import Keys
 import pytesseract
+from curl_cffi import requests
 from PIL import Image
 import io
 import os
@@ -355,43 +356,90 @@ class base(object):
         return data
 
     @staticmethod
-    def crawl_data(url) -> BeautifulSoup | None:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
-        response = requests.get(url, headers=headers, timeout=20)
-        if response.status_code == 200:
-            soup = BeautifulSoup(response.content, "html.parser")
-            return soup
-        else:
-            print(f"Page {url} returned status {response.status_code}. Skipping.")
+    def crawl_data(
+        url: str, 
+        return_type: Literal["soup", "text", "content"] = "soup",
+        impersonate: Optional[str] = "chrome120"
+    ) -> Union[BeautifulSoup, str, bytes, None]:
+        """
+        Crawls a URL and returns the data in the specified format.
+        
+        :param url: The target URL.
+        :param return_type: "soup" (BeautifulSoup obj), "text" (HTML string), or "content" (raw bytes).
+        :param impersonate: Browser to impersonate (e.g., "chrome120", "safari15_3"). Set to None for a standard request.
+        """
+        try:
+            # Set up request arguments dynamically
+            request_args = {"timeout": 20}
+            
+            if impersonate:
+                request_args["impersonate"] = impersonate
+            else:
+                # Fallback headers if we aren't impersonating a browser
+                request_args["headers"] = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+                }
+
+            # Execute the request
+            response = requests.get(url, **request_args)
+
+            if response.status_code == 200:
+                # Return the data based on the requested type
+                if return_type == "soup":
+                    return BeautifulSoup(response.content, "html.parser")
+                elif return_type == "text":
+                    return response.text
+                elif return_type == "content":
+                    return response.content
+                else:
+                    print(f"Invalid return_type '{return_type}'. Returning None.")
+                    return None
+            else:
+                print(f"Page {url} returned status {response.status_code}. Skipping.")
+                return None
+                
+        except Exception as e:
+            print(f"Error crawling {url}: {e}")
             return None
-    
+
+
     @staticmethod
-    def crawl_text_from_soup(soup: BeautifulSoup, css_locator: str) -> str:
-        """Lấy text và giữ nguyên vị trí ảnh bằng Placeholder"""
+    def crawl_text_from_soup(data: Union[BeautifulSoup, str, None], css_locator: str) -> str:
+        """Lấy text và giữ nguyên vị trí ảnh bằng Placeholder từ Soup hoặc HTML string"""
+        
+        # 1. Safely handle if crawl_data failed and returned None
+        if not data:
+            print("No data provided to extract_text. Skipping.")
+            return ""
+            
+        # 2. If data is a raw HTML string, convert it to Soup automatically
+        if isinstance(data, str):
+            soup = BeautifulSoup(data, "html.parser")
+        else:
+            soup = data # It's already a BeautifulSoup object
+
+        # 3. Find the element
         element = soup.select_one(css_locator)
         if not element:
+            print(f"Could not find element with locator: {css_locator}")
             return ""
 
-        # 1. Dọn rác tàng hình (Anti-scraping)
+        # --- The rest of your original logic stays exactly the same ---
+        
+        # Dọn rác tàng hình (Anti-scraping)
         for hidden_span in element.find_all('span', style=lambda value: value and 'font-size:0' in value.replace(' ', '')):
             hidden_span.decompose()
 
-        # 2. TÌM VÀ ĐÁNH DẤU ẢNH
+        # TÌM VÀ ĐÁNH DẤU ẢNH
         for img in element.find_all('img'):
-            # Lấy link ảnh (nhiều web dùng data-src để lazyload)
             src = img.get('src') or img.get('data-src') or img.get('data-original')
             if src:
-                # Ép kiểu link (nếu web dùng link tương đối dạng //domain.com)
                 if src.startswith("//"):
                     src = "https:" + src
-                    
-                # Tạo chuỗi đánh dấu thay thế cho thẻ img
                 placeholder = f"\n[IMAGE_MARKER_START]{src}[IMAGE_MARKER_END]\n"
                 img.replace_with(placeholder)
 
-        # 3. Lấy toàn bộ Text (Lúc này ảnh đã biến thành các dòng chữ Marker)
+        # Lấy toàn bộ Text 
         return element.get_text(separator='\n', strip=True)
 
 

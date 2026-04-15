@@ -9,8 +9,8 @@ from src.base_functions import *
 from src.newlocators import truyenfullvision as lo
 
 
-storyName = "gia_lai_co_mot_nguoi_nhu_em"
-main_url = "https://truyenfull.vision/gia-lai-co-mot-nguoi-nhu-em/"
+storyName = "dai_tieu_thu_ho_manh"
+main_url = "https://truyenfull.vision/dai-tieu-thu-ho-manh-vong-nhuoc/"
 
 
 
