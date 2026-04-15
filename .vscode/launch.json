@@ -2,10 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Debug co_chap",
+            "name": "Python: Debug wattpad",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/test/co_chap.py",
+            "program": "${workspaceFolder}/newtest/wattpad_crawler.py",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}"
