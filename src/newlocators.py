@@ -26,3 +26,12 @@ class mongtruyen:
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input.password-input")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button#btnSubmitPassword")
     accept_warning_btn : tuple[By, str] = (By.CSS_SELECTOR, "div.gioi-han-do-tuoi-warning-box a.gioi-han-do-tuoi-btn-continue")
+
+@dataclass
+class wordpress:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
+    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
+    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
