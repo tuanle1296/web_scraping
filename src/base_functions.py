@@ -23,7 +23,7 @@ from seleniumbase import Driver
 
 class base(object):
 
-    def __init__(self, is_headless_mode=True, timeout=5, use_seleniumbase=False):
+    def __init__(self, is_headless_mode=True, timeout=5, use_seleniumbase=False, page_load_strategy="normal"):
         self.path = None
         self.timeout = timeout
 
@@ -31,12 +31,12 @@ class base(object):
             # ---------------------------------------------------------
             # SELENIUMBASE (By pass Cloudflare, Anti-bot)
             # ---------------------------------------------------------
-            print("Starting browser with SeleniumBase (UC Mode)...")
+            print(f"Starting browser with SeleniumBase (UC Mode, strategy={page_load_strategy})...")
             self.driver = Driver(
                 uc=True,
                 headless=is_headless_mode,
                 no_sandbox=True,
-                page_load_strategy="eager",
+                page_load_strategy=page_load_strategy,
                 window_size="1920,1080"
                
             )
@@ -44,12 +44,12 @@ class base(object):
             # ---------------------------------------------------------
             # SELENIUM
             # ---------------------------------------------------------
-            print("Starting browser with Selenium...")
+            print(f"Starting browser with Selenium (strategy={page_load_strategy})...")
             options = webdriver.ChromeOptions()
             options.add_argument('--deny-permission-prompts')
             if is_headless_mode:
                 options.add_argument('--headless=new')
-            options.page_load_strategy = 'eager'
+            options.page_load_strategy = page_load_strategy
             options.add_argument('--disable-dev-shm-usage') 
             options.add_argument('--no-sandbox')
             options.add_argument('--window-size=1920,1080')
