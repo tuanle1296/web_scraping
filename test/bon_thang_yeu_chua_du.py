@@ -13,12 +13,11 @@ def crawl_worker(chapter_data, folder_name):
     Worker function to process a chunk of chapters.
     chapter_data: list of tuples (url, chapter_number)
     """
-    crawl = base()
-    try:
-        crawl.create_folder(folder_name)
-    except:
-        pass
-    crawl.quit_driver()  # Close browser immediately as we use API for crawling
+    with Base() as crawl:
+        try:
+            crawl.create_folder(folder_name)
+        except:
+            pass
 
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
@@ -78,24 +77,23 @@ def crawl_worker(chapter_data, folder_name):
 
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False)
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(f"Error creating folder: {e}")
+    with Base(False) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
 
-    chapters_list = []
-    main_url = f"https://gacsach.org/bon-thang-yeu-chua-du_nhan-hai-trung.full"
+        chapters_list = []
+        main_url = f"https://gacsach.org/bon-thang-yeu-chua-du_nhan-hai-trung.full"
     
-    crawl.go_to_webpage(main_url)
-    crawl.wait_for_page_load(10)
-    chap_list = crawl.find_elements(lo.chap_list)
-    for chap in chap_list:
-        anchors = crawl.find_elements(lo.a_tag, chap)
-        for anchor in anchors:
-            chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
-    crawl.quit_driver()  # Close the initial driver
+        crawl.go_to_webpage(main_url)
+        crawl.wait_for_page_load(10)
+        chap_list = crawl.find_elements(lo.chap_list)
+        for chap in chap_list:
+            anchors = crawl.find_elements(lo.a_tag, chap)
+            for anchor in anchors:
+                chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
 
     # Prepare data: list of (url, chapter_number)
     indexed_chapters = []

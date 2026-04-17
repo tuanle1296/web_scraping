@@ -13,7 +13,7 @@ class PreData:
 pre_data = PreData()
 def crawl_chap_1_test():
 
-    crawl_1 = base()
+    crawl_1 = Base()
 
     print("========Go to webpage=========")
     crawl_1.go_to_webpage(pre_data.main_web_page)

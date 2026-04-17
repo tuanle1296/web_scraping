@@ -13,7 +13,7 @@ from src.locators import gon_gio_dem as lo
 #     Worker function to process a chunk of chapters.
 #     chapter_data: list of tuples (url, chapter_number)
 #     """
-#     crawl = base()
+#     crawl = Base()
 #     try:
 #         crawl.create_folder(folder_name)
 #     except:
@@ -31,33 +31,32 @@ from src.locators import gon_gio_dem as lo
 
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False)
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(f"Error creating folder: {e}")
+    with Base(False) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
 
-    crawl.go_to_webpage("https://metruyenhot.me/gon-gio-dem/chuong-32/")
-    crawl.wait_for_page_load(10)
+        crawl.go_to_webpage("https://metruyenhot.me/gon-gio-dem/chuong-32/")
+        crawl.wait_for_page_load(10)
 
-    crawl.sleep(5)
-    title = crawl.get_element_text(lo.chapter_title)
-    content = crawl.get_element_text(lo.chapter_content)
-    crawl.add_text_to_doc_file(title, content, "chapter_32")
+        crawl.sleep(5)
+        title = crawl.get_element_text(lo.chapter_title)
+        content = crawl.get_element_text(lo.chapter_content)
+        crawl.add_text_to_doc_file(title, content, "chapter_32")
 
-    # chapters_list = []
-    # for i in range (1, 3):
-    #     main_url = f"https://metruyenhot.vn/gon-gio-dem?page={i}"
+        # chapters_list = []
+        # for i in range (1, 3):
+        #     main_url = f"https://metruyenhot.vn/gon-gio-dem?page={i}"
     
-    #     crawl.go_to_webpage(main_url)
-    #     crawl.wait_for_page_load(10)
-    #     chap_list = crawl.find_elements(lo.chap_list)
-    #     for chap in chap_list:
-    #         anchors = crawl.find_elements(lo.a_tag, chap)
-    #         for anchor in anchors:
-    #             chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
-    crawl.quit_driver()  # Close the initial driver
+        #     crawl.go_to_webpage(main_url)
+        #     crawl.wait_for_page_load(10)
+        #     chap_list = crawl.find_elements(lo.chap_list)
+        #     for chap in chap_list:
+        #         anchors = crawl.find_elements(lo.a_tag, chap)
+        #         for anchor in anchors:
+        #             chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
 
     # # Prepare data: list of (url, chapter_number)
     # indexed_chapters = []

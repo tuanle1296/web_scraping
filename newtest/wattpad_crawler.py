@@ -49,99 +49,91 @@ def get_story_toc(start_url):
 
 
 def crawl_worker(chapter_data, folder_name):
-    crawl = base(is_headless_mode=True) 
-    try:
-        crawl.set_path(folder_name)
-    except Exception as e:
-        print(f"Error while setting folder path: {e}")
-
-    failed_chapters = []
-    
-    for chapter, chap_num in chapter_data:
-        chap_id = chapter['id']
-        chap_title = chapter['title']
-        
+    with Base(is_headless_mode=True) as crawl:
         try:
-            print(f"Crawling Chapter {chap_num}: {chap_title}")
-            api_url = f"https://www.wattpad.com/apiv2/storytext?id={chap_id}"
-            
-            # 1. Ask for RAW TEXT
-            raw_text = crawl.crawl_data(api_url, return_type="text", impersonate="chrome120")
-            
-            if raw_text:
-                
-                # Check if Wattpad accidentally returned JSON
-                if raw_text.strip().startswith("{"):
-                    import json
-                    try:
-                        data = json.loads(raw_text)
-                        raw_html = data.get("text", raw_text) # Extract the text if it's JSON
-                    except json.JSONDecodeError:
-                        raw_html = raw_text
-                else:
-                    raw_html = raw_text
-
-                # 2. Parse the HTML directly (No dummy wrappers!)
-                soup = BeautifulSoup(raw_html, "html.parser")
-                
-                # 3. Apply your cleaning logic DIRECTLY to the entire soup 
-                # (No need to use select_one() or locators)
-                
-                # Clean Anti-scraping spans
-                for hidden in soup.find_all('span', style=lambda value: value and 'font-size:0' in value.replace(' ', '')):
-                    hidden.decompose()
-
-                # Mark Images
-                for img in soup.find_all('img'):
-                    src = img.get('src') or img.get('data-src') or img.get('data-original')
-                    if src:
-                        if src.startswith("//"):
-                            src = "https:" + src
-                        img.replace_with(f"\n[IMAGE_MARKER_START]{src}[IMAGE_MARKER_END]\n")
-
-                # Extract the final text
-                content = soup.get_text(separator="\n", strip=True)
-                
-                if not content or "Cloudflare" in content:
-                    print(f"   ❌ WARNING: Content is empty or blocked by Cloudflare!")
-                else:
-                    # 4. Save the document
-                    file_name = f"chapter_{chap_num}"
-                    crawl.add_text_to_doc_file(chap_title, content, file_name)
-                    print(f"   ✅ Saved Chapter {chap_num} successfully.")
-                    
-            else:
-                raise Exception("crawl_data failed and returned None.")
-                
+            crawl.set_path(folder_name)
         except Exception as e:
-            failed_chapters.append((chap_title, chap_num))
-            print(f"====== Warning: Error crawling {chap_title}", e)
-            
-        # ⚠️ CRITICAL: Sleep to prevent Cloudflare from banning your IP
-        time.sleep(3)
+            print(f"Error while setting folder path: {e}")
 
-    if failed_chapters:
-        print(f"Failed chapters in this worker: {failed_chapters}")
+        failed_chapters = []
         
-    try:
-        crawl.quit_driver()
-    except:
-        pass
+        for chapter, chap_num in chapter_data:
+            chap_id = chapter['id']
+            chap_title = chapter['title']
+            
+            try:
+                print(f"Crawling Chapter {chap_num}: {chap_title}")
+                api_url = f"https://www.wattpad.com/apiv2/storytext?id={chap_id}"
+                
+                # 1. Ask for RAW TEXT
+                raw_text = crawl.crawl_data(api_url, return_type="text", impersonate="chrome120")
+                
+                if raw_text:
+                    
+                    # Check if Wattpad accidentally returned JSON
+                    if raw_text.strip().startswith("{"):
+                        import json
+                        try:
+                            data = json.loads(raw_text)
+                            raw_html = data.get("text", raw_text) # Extract the text if it's JSON
+                        except json.JSONDecodeError:
+                            raw_html = raw_text
+                    else:
+                        raw_html = raw_text
+
+                    # 2. Parse the HTML directly (No dummy wrappers!)
+                    soup = BeautifulSoup(raw_html, "html.parser")
+                    
+                    # 3. Apply your cleaning logic DIRECTLY to the entire soup 
+                    
+                    # Clean Anti-scraping spans
+                    for hidden in soup.find_all('span', style=lambda value: value and 'font-size:0' in value.replace(' ', '')):
+                        hidden.decompose()
+
+                    # Mark Images
+                    for img in soup.find_all('img'):
+                        src = img.get('src') or img.get('data-src') or img.get('data-original')
+                        if src:
+                            if src.startswith("//"):
+                                src = "https:" + src
+                            img.replace_with(f"\n[IMAGE_MARKER_START]{src}[IMAGE_MARKER_END]\n")
+
+                    # Extract the final text
+                    content = soup.get_text(separator="\n", strip=True)
+                    
+                    if not content or "Cloudflare" in content:
+                        print(f"   ❌ WARNING: Content is empty or blocked by Cloudflare!")
+                    else:
+                        # 4. Save the document
+                        file_name = f"chapter_{chap_num}"
+                        crawl.add_text_to_doc_file(chap_title, content, file_name)
+                        print(f"   ✅ Saved Chapter {chap_num} successfully.")
+                        
+                else:
+                    raise Exception("crawl_data failed and returned None.")
+                    
+            except Exception as e:
+                failed_chapters.append((chap_title, chap_num))
+                print(f"====== Warning: Error crawling {chap_title}", e)
+                
+            # ⚠️ CRITICAL: Sleep to prevent Cloudflare from banning your IP
+            time.sleep(3)
+
+        if failed_chapters:
+            print(f"Failed chapters in this worker: {failed_chapters}")
 
 
 def main(folder_name):
     print(f"======= Create {folder_name} folder =======")
     
     # Just initialize base to use the folder creation utility
-    crawl = base(is_headless_mode=True)
-    try:
-        crawl.create_folder(folder_name)
-        print(f"======= Created folder {folder_name} successfully ======")
-    except Exception as e:
-        return(f"Error creating folder: {e}")
-    finally:
-        try: crawl.quit_driver() 
-        except: pass
+    with Base(is_headless_mode=True) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print(f"======= Created folder {folder_name} successfully ======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
+            return
 
     # 1. Get all chapters via API instead of opening a Selenium browser
     try:
@@ -169,5 +161,3 @@ def main(folder_name):
 
 if __name__ == '__main__':
     main(storyName)
-
-'''Note: run this code using cmd: uv run newtest/wattpad_crawler.py'''

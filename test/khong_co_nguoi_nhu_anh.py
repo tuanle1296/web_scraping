@@ -6,38 +6,37 @@ url = "https://mmtd1314.wordpress.com/2021/06/21/khong-co-nguoi-nhu-anh-tue-kien
 
 def crawl_truyen(folder_name):
     print("=======Create folder=======")
-    crawl = base()
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(e)
-    locators = kcnna
-    crawl.go_to_webpage(url)
-    print("=========Start crawling==========")
-    chap_url = crawl.get_attribute_from_all_elements(locators.chap_locators, "href")
-    for item in chap_url:
-        crawl.go_to_webpage(item)
-        check = crawl.verify_element(locators.password_field)
-        if check is True:
-            crawl.input_text(locators.password_field ,locators.password_1)
-            crawl.click_element(locators.submit_pass_btn)
-            re_check = crawl.verify_element(locators.password_field)
-            if re_check is True:
-                crawl.input_text(locators.password_field, locators.password_2)
+    with Base() as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(e)
+        locators = kcnna
+        crawl.go_to_webpage(url)
+        print("=========Start crawling==========")
+        chap_url = crawl.get_attribute_from_all_elements(locators.chap_locators, "href")
+        for item in chap_url:
+            crawl.go_to_webpage(item)
+            check = crawl.verify_element(locators.password_field)
+            if check is True:
+                crawl.input_text(locators.password_field ,locators.password_1)
                 crawl.click_element(locators.submit_pass_btn)
-                time.sleep(2)
-        page = crawl.get_page_source()
-        crawl.pass_data_to_file(page, "datafile.html")
-        with open("datafile.html", 'r') as file:
-            beautifulSoupText = BeautifulSoup(file.read(), 'html.parser')
-            chap_title = crawl.get_element_by_class(beautifulSoupText, locators.chap_title)
-            chap_content = crawl.get_element_by_class(beautifulSoupText, locators.chap_content)
-            crawl.save_doc(chap_title, chap_content)
-        print("Chap title: ", str(chap_title.text).strip())
-    crawl.remove_file_if_exists("datafile.html")
-    print("=====FINISHED=====")
-    crawl.quit_driver()
+                re_check = crawl.verify_element(locators.password_field)
+                if re_check is True:
+                    crawl.input_text(locators.password_field, locators.password_2)
+                    crawl.click_element(locators.submit_pass_btn)
+                    time.sleep(2)
+            page = crawl.get_page_source()
+            crawl.pass_data_to_file(page, "datafile.html")
+            with open("datafile.html", 'r') as file:
+                beautifulSoupText = BeautifulSoup(file.read(), 'html.parser')
+                chap_title = crawl.get_element_by_class(beautifulSoupText, locators.chap_title)
+                chap_content = crawl.get_element_by_class(beautifulSoupText, locators.chap_content)
+                crawl.save_doc(chap_title, chap_content)
+            print("Chap title: ", str(chap_title.text).strip())
+        crawl.remove_file_if_exists("datafile.html")
+        print("=====FINISHED=====")
 
 
     

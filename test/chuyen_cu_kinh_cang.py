@@ -75,24 +75,24 @@ def scrape_chapter_content(url, crawl_instance, locators_instance):
 
 def scrape_story(base_url):
     """Finds all chapter links from a story page and scrapes each one."""
-    crawl = base()
-    locators = chuyen_cu_kinh_cang()
+    with Base() as crawl:
+        locators = chuyen_cu_kinh_cang()
     
-    print(f"--- Starting to scrape story from: {base_url} ---")
-    main_page_soup = crawl.crawl_data(base_url)
+        print(f"--- Starting to scrape story from: {base_url} ---")
+        main_page_soup = crawl.crawl_data(base_url)
     
-    story_title_element = main_page_soup.find(locators.title)
-    story_title = story_title_element.get_text().strip() if story_title_element else "story"
+        story_title_element = main_page_soup.find(locators.title)
+        story_title = story_title_element.get_text().strip() if story_title_element else "story"
     
-    # Create a folder named after the story
-    crawl.create_folder(story_title)
-    print(f"Created folder: '{story_title}'")
+        # Create a folder named after the story
+        crawl.create_folder(story_title)
+        print(f"Created folder: '{story_title}'")
 
-    chapter_links = [a['href'] for a in main_page_soup.select(locators.chapter_link)]
+        chapter_links = [a['href'] for a in main_page_soup.select(locators.chapter_link)]
     
-    print(f"Found {len(chapter_links)} chapters. Starting download...\n")
-    for link in chapter_links:
-        scrape_chapter_content(link, crawl, locators)
+        print(f"Found {len(chapter_links)} chapters. Starting download...\n")
+        for link in chapter_links:
+            scrape_chapter_content(link, crawl, locators)
 
-# --- Main Execution ---
-scrape_story("https://rungtruyen.com/category/ngon-tinh/chuyen-cu-kinh-cang/")
+    # --- Main Execution ---
+    scrape_story("https://rungtruyen.com/category/ngon-tinh/chuyen-cu-kinh-cang/")
