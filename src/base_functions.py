@@ -23,7 +23,7 @@ from seleniumbase import Driver
 
 class base(object):
 
-    def __init__(self, is_headless_mode=True, timeout=5, use_seleniumbase=False, page_load_strategy="normal"):
+    def __init__(self, is_headless_mode=True, timeout=5, use_seleniumbase=False, page_load_strategy="eager"):
         self.path = None
         self.timeout = timeout
 
