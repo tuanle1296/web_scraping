@@ -14,62 +14,55 @@ def crawl_worker(chapter_data, folder_name):
     Worker function to process a chunk of chapters.
     chapter_data: list of tuples (url, chapter_number)
     """
-    crawl = base(is_headless_mode=True)
-    try:
-        crawl.create_folder(folder_name)
-    except:
-        pass
-    finally:
-        crawl.set_path(folder_name)
+    with Base(is_headless_mode=True) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+        except:
+            pass
+        finally:
+            crawl.set_path(folder_name)
     
-    try:
-        for chap_url, chap_num in chapter_data:
-            try:
-                print(f"Crawling: {chap_url}")
-                crawl.go_to_webpage(chap_url)
-                crawl.sleep(3)
-                if (crawl.is_element_visible(lo.age_submit_btn)):
-                    crawl.click_element(lo.age_submit_btn)
-                    crawl.sleep(5)
-                crawl.wait_for_page_load(10)
-                title = crawl.get_element_text(lo.chapter_title)
-                content = crawl.get_element_text(lo.chapter_content)
-                crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
-            except Exception as e:
-                print(f"====== Warning: Error crawling {chap_url}", e)
-    except Exception as faltal_error:
-        print(f"Fatal error cause crash worker: {faltal_error}")
-    finally:
-            crawl.quit_driver()
+        try:
+            for chap_url, chap_num in chapter_data:
+                try:
+                    print(f"Crawling: {chap_url}")
+                    crawl.go_to_webpage(chap_url)
+                    crawl.sleep(3)
+                    if (crawl.is_element_visible(lo.age_submit_btn)):
+                        crawl.click_element(lo.age_submit_btn)
+                        crawl.sleep(5)
+                    crawl.wait_for_page_load(10)
+                    title = crawl.get_element_text(lo.chapter_title)
+                    content = crawl.get_element_text(lo.chapter_content)
+                    crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
+                except Exception as e:
+                    print(f"====== Warning: Error crawling {chap_url}", e)
+        except Exception as faltal_error:
+            print(f"Fatal error cause crash worker: {faltal_error}")
         
-
-
-
-
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False)
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(f"Error creating folder: {e}")
+    with Base(False) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
 
-    chapters_list = []
-    main_url = "https://suonxaochuangot.net/ban-cong/"
+        chapters_list = []
+        main_url = "https://suonxaochuangot.net/ban-cong/"
     
-    crawl.go_to_webpage(main_url)
-    crawl.wait_for_page_load(10)
-    crawl.sleep(5)
-    if (crawl.is_element_visible(lo.age_submit_btn)):
-        crawl.click_element(lo.age_submit_btn)
+        crawl.go_to_webpage(main_url)
+        crawl.wait_for_page_load(10)
         crawl.sleep(5)
-    chap_list = crawl.find_elements(lo.chap_list)
-    for chap in chap_list:
-        anchors = crawl.find_elements(lo.a_tag, chap)
-        for anchor in anchors:
-            chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
-    crawl.quit_driver()  # Close the initial driver
+        if (crawl.is_element_visible(lo.age_submit_btn)):
+            crawl.click_element(lo.age_submit_btn)
+            crawl.sleep(5)
+        chap_list = crawl.find_elements(lo.chap_list)
+        for chap in chap_list:
+            anchors = crawl.find_elements(lo.a_tag, chap)
+            for anchor in anchors:
+                chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
 
     # Prepare data: list of (url, chapter_number)
     indexed_chapters = []

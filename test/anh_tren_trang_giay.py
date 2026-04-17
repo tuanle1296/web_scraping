@@ -13,12 +13,11 @@ def crawl_worker(chapter_data, folder_name):
     Worker function to process a chunk of chapters.
     chapter_data: list of tuples (url, chapter_number)
     """
-    crawl = base()
-    try:
-        crawl.create_folder(folder_name)
-    except:
-        pass
-    crawl.quit_driver()
+    with Base() as crawl:
+        try:
+            crawl.create_folder(folder_name)
+        except:
+            pass
     
     for chap_url, chap_num in chapter_data:
         try:
@@ -36,26 +35,25 @@ def crawl_worker(chapter_data, folder_name):
 
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False)
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(f"Error creating folder: {e}")
+    with Base(False) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
 
-    chapters_list = []
+        chapters_list = []
 
-    main_url = "https://metruyenhot.vn/anh-tren-trang-giay/"
+        main_url = "https://metruyenhot.vn/anh-tren-trang-giay/"
     
-    crawl.go_to_webpage(main_url)
-    crawl.wait_for_page_load(10)
-    crawl.sleep(3)
-    chap_list = crawl.find_elements(lo.chap_list)
-    for chap in chap_list:
-        anchors = crawl.find_elements(lo.a_tag, chap)
-        for anchor in anchors:
-            chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
-    crawl.quit_driver()  # Close the initial driver
+        crawl.go_to_webpage(main_url)
+        crawl.wait_for_page_load(10)
+        crawl.sleep(3)
+        chap_list = crawl.find_elements(lo.chap_list)
+        for chap in chap_list:
+            anchors = crawl.find_elements(lo.a_tag, chap)
+            for anchor in anchors:
+                chapters_list.append(crawl.get_attribute_from_element(anchor, "href"))
 
     # Prepare data: list of (url, chapter_number)
     indexed_chapters = []

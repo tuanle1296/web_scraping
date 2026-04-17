@@ -13,56 +13,54 @@ def crawl_worker(chapter_data, folder_name):
     Worker function to process a chunk of chapters.
     chapter_data: list of tuples (url, chapter_number)
     """
-    crawl = base(False)
-    try:
-        crawl.create_folder(folder_name)
-    except:
-        pass
-    passwords = ["313", "6262", "39384"]
+    with Base(False) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+        except:
+            pass
+        passwords = ["313", "6262", "39384"]
 
-    for chap_url, chap_num in chapter_data:
-        crawl.go_to_webpage(chap_url)
-        if not crawl.wait_for_page_load(10):
-            print(f"Page {chap_url} did not load correctly. Skipping.")
-            continue
+        for chap_url, chap_num in chapter_data:
+            crawl.go_to_webpage(chap_url)
+            if not crawl.wait_for_page_load(10):
+                print(f"Page {chap_url} did not load correctly. Skipping.")
+                continue
 
-        if crawl.is_element_visible(lo.password_input_field):
-            print(f"Password field found for Chap {chap_num}. Trying passwords...")
-            for password in passwords:
-                crawl.input_text(lo.password_input_field, password)
-                crawl.click_element(lo.password_submit_btn)
-                # Using a short sleep is sometimes necessary for pages with JS redirects.
-                crawl.sleep(5)
-                crawl.wait_for_page_load(10)
-                if crawl.is_element_visible(lo.password_input_field) is False:
-                    break  # breaks inner password loop
+            if crawl.is_element_visible(lo.password_input_field):
+                print(f"Password field found for Chap {chap_num}. Trying passwords...")
+                for password in passwords:
+                    crawl.input_text(lo.password_input_field, password)
+                    crawl.click_element(lo.password_submit_btn)
+                    # Using a short sleep is sometimes necessary for pages with JS redirects.
+                    crawl.sleep(5)
+                    crawl.wait_for_page_load(10)
+                    if crawl.is_element_visible(lo.password_input_field) is False:
+                        break  # breaks inner password loop
 
-        print(f"Crawling: {chap_url}")
-        title = crawl.get_element_text(lo.chapter_title)
-        content = crawl.get_element_text(lo.chapter_content)
+            print(f"Crawling: {chap_url}")
+            title = crawl.get_element_text(lo.chapter_title)
+            content = crawl.get_element_text(lo.chapter_content)
 
-        crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
+            crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
 
-    crawl.quit_driver()
 
 
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False)
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(f"Error creating folder: {e}")
+    with Base(False) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
 
-    main_url = "https://beetruyen.net/ngo-cu-tinh-sau.html"
-    crawl.go_to_webpage(main_url)
-    crawl.wait_for_page_load(10)
-    chap_list = crawl.find_element(lo.chap_list)
-    urls_list = crawl.find_elements(lo.a_tag, chap_list)
+        main_url = "https://beetruyen.net/ngo-cu-tinh-sau.html"
+        crawl.go_to_webpage(main_url)
+        crawl.wait_for_page_load(10)
+        chap_list = crawl.find_element(lo.chap_list)
+        urls_list = crawl.find_elements(lo.a_tag, chap_list)
 
-    chapters_list = [crawl.get_attribute_from_element(url, "href") for url in urls_list]
-    crawl.quit_driver()  # Close the initial driver
+        chapters_list = [crawl.get_attribute_from_element(url, "href") for url in urls_list]
 
     # Prepare data: list of (url, chapter_number)
     indexed_chapters = []

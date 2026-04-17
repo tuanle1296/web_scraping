@@ -18,61 +18,19 @@ web_data = Url()
 
 def main(folder_name, url, chap_locator):
     print("=======Create folder=======")
-    crawl = base()
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(e)
-    locators = chi_yeu_minh_anh
-    crawl.go_to_webpage(url)
-    print("=========Start crawling==========")
-    chap_url = crawl.get_attribute_from_all_elements(chap_locator, web_data.href_attribute)
-    for item in chap_url:
-        crawl.go_to_webpage(item)
-        soup = crawl.crawl_data(item)
-        chap_title = crawl.get_element_by_class(soup, locators.title)
-        chap_content = crawl.get_element_by_class(soup, locators.content)
-        print(chap_title.text)
-        is_content = crawl.wait_until_page_contains(locators.is_content_img, 2)
-        print("is content image: ", is_content)
-        if is_content is True:
-            img_name = crawl.define_img_name(chap_title.text)
-            crawl.capture_screen(img_name)
-        else:
-            crawl.save_doc(chap_title, chap_content)
-    print("=====FINISHED=====")
-    crawl.quit_driver()
-        
-
-def main_2(folder_name, url):
-    print("=======Create folder=======")
-    crawl = base()
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(e)
-    locators = chi_yeu_minh_anh
-    crawl.go_to_webpage(url)
-    print("=========Start crawling==========")
-    chap_list = []
-    for ii in range(19, 64):
-        cur_chap = crawl.replace_text(locators.chap_19_to_63, "INPUT", str(ii))
-        cur_chap_temp = crawl.replace_text(locators.chap_, "INPUT", str(ii))
+    with Base() as crawl:
         try:
-            chap_url = crawl.get_attribute_from_element((By.XPATH, cur_chap), web_data.href_attribute)
-        except:
-            chap_url = crawl.get_attribute_from_element((By.XPATH, cur_chap_temp), web_data.href_attribute)
-        chap_list.append(chap_url)
-    for i in range(len(chap_list)):
-        print(chap_list[i])
-        if web_data.facebook_text in chap_list[i]:
-            print("Skip")
-        crawl.go_to_webpage(chap_list[i])
-
-        soup = crawl.crawl_data(chap_list[i])
-        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(e)
+        locators = chi_yeu_minh_anh
+        crawl.go_to_webpage(url)
+        print("=========Start crawling==========")
+        chap_url = crawl.get_attribute_from_all_elements(chap_locator, web_data.href_attribute)
+        for item in chap_url:
+            crawl.go_to_webpage(item)
+            soup = crawl.crawl_data(item)
             chap_title = crawl.get_element_by_class(soup, locators.title)
             chap_content = crawl.get_element_by_class(soup, locators.content)
             print(chap_title.text)
@@ -83,10 +41,50 @@ def main_2(folder_name, url):
                 crawl.capture_screen(img_name)
             else:
                 crawl.save_doc(chap_title, chap_content)
-        except:
-            pass
-    print("=====FINISHED=====")
-    crawl.quit_driver()
+        print("=====FINISHED=====")
+        
+
+def main_2(folder_name, url):
+    print("=======Create folder=======")
+    with Base() as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(e)
+        locators = chi_yeu_minh_anh
+        crawl.go_to_webpage(url)
+        print("=========Start crawling==========")
+        chap_list = []
+        for ii in range(19, 64):
+            cur_chap = crawl.replace_text(locators.chap_19_to_63, "INPUT", str(ii))
+            cur_chap_temp = crawl.replace_text(locators.chap_, "INPUT", str(ii))
+            try:
+                chap_url = crawl.get_attribute_from_element((By.XPATH, cur_chap), web_data.href_attribute)
+            except:
+                chap_url = crawl.get_attribute_from_element((By.XPATH, cur_chap_temp), web_data.href_attribute)
+            chap_list.append(chap_url)
+        for i in range(len(chap_list)):
+            print(chap_list[i])
+            if web_data.facebook_text in chap_list[i]:
+                print("Skip")
+            crawl.go_to_webpage(chap_list[i])
+
+            soup = crawl.crawl_data(chap_list[i])
+            try:
+                chap_title = crawl.get_element_by_class(soup, locators.title)
+                chap_content = crawl.get_element_by_class(soup, locators.content)
+                print(chap_title.text)
+                is_content = crawl.wait_until_page_contains(locators.is_content_img, 2)
+                print("is content image: ", is_content)
+                if is_content is True:
+                    img_name = crawl.define_img_name(chap_title.text)
+                    crawl.capture_screen(img_name)
+                else:
+                    crawl.save_doc(chap_title, chap_content)
+            except:
+                pass
+        print("=====FINISHED=====")
 
 
 if __name__ == '__main__':

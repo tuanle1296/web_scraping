@@ -12,7 +12,7 @@ from src.locators import vo_nho_mang_thai_ho_cua_dai_thuc as lo
 #     Worker function to process a chunk of chapters.
 #     chapter_data: list of tuples (url, chapter_number)
 #     """
-#     crawl = base()
+#     crawl = Base()
 #     try:
 #         crawl.create_folder(folder_name)
 #     except:
@@ -39,40 +39,39 @@ from src.locators import vo_nho_mang_thai_ho_cua_dai_thuc as lo
 
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False)
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(f"Error creating folder: {e}")
+    with Base(False) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
 
-    # chapters_list = []
-    # for i in range (1, 3):
-    main_url = "https://truyencom.com/vo-nho-mang-thai-ho-cua-dai-thuc/chuong-35.html"
+        # chapters_list = []
+        # for i in range (1, 3):
+        main_url = "https://truyencom.com/vo-nho-mang-thai-ho-cua-dai-thuc/chuong-35.html"
     
-    crawl.go_to_webpage(main_url)
-    crawl.wait_for_page_load(10)
-    status = True
-    index = 35
-    while status:
-        
+        crawl.go_to_webpage(main_url)
         crawl.wait_for_page_load(10)
-        crawl.sleep(3)
-        title = crawl.get_element_text(lo.chapter_title)
-        content = crawl.get_element_text(lo.chapter_content)
-        current_url = crawl.get_current_url()
-        print(f"Crawling: {current_url}")
-        # file_name = current_url.split('/')[-1].split('.')[0]
-        crawl.add_text_to_doc_file(title, content, "chapter_" + str(index))
+        status = True
+        index = 35
+        while status:
+        
+            crawl.wait_for_page_load(10)
+            crawl.sleep(3)
+            title = crawl.get_element_text(lo.chapter_title)
+            content = crawl.get_element_text(lo.chapter_content)
+            current_url = crawl.get_current_url()
+            print(f"Crawling: {current_url}")
+            # file_name = current_url.split('/')[-1].split('.')[0]
+            crawl.add_text_to_doc_file(title, content, "chapter_" + str(index))
 
-        class_attribute = crawl.get_attribute_from_element(lo.next_chap_btn, "class")
-        if "disabled" in class_attribute:
-            status = False
-        else:
-            crawl.click_element(lo.next_chap_btn)
-            index += 1
+            class_attribute = crawl.get_attribute_from_element(lo.next_chap_btn, "class")
+            if "disabled" in class_attribute:
+                status = False
+            else:
+                crawl.click_element(lo.next_chap_btn)
+                index += 1
     
-    crawl.quit_driver()  # Close the initial driver
     
     #     chap_list = crawl.find_elements(lo.chap_list)
     #     for chap in chap_list:

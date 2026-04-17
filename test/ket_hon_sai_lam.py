@@ -10,7 +10,7 @@ from dataclasses import dataclass
 # def crawl_data(folder_name):
 #     print("=======Create folder " + folder_name + " =======")
 #     time.sleep(2)
-#     crawl = base()
+#     crawl = Base()
 #     crawl.create_folder(folder_name)
 #     print("=======Created folder " + folder_name + " successfully======")
 #
@@ -47,7 +47,7 @@ data = Data()
 
 def crawl_from_chap_1_to_31(folder_name):
     print("=======Create folder=======")
-    crawl_1 = base()
+    crawl_1 = Base()
     try:
         crawl_1.create_folder(folder_name)
         print("=======Created folder successfully======")
@@ -76,7 +76,7 @@ def crawl_from_chap_1_to_31(folder_name):
 
 def crawl_from_chap_32_to_57(folder_name):
     print("=======Create folder=======")
-    crawl_2 = base()
+    crawl_2 = Base()
     try:
         crawl_2.create_folder(folder_name)
         print("=======Created folder successfully======")
@@ -105,7 +105,7 @@ def crawl_from_chap_32_to_57(folder_name):
 
 def crawl_ngoai_truyen_1(folder_name, password):
     print("=======Create folder=======")
-    crawl_3 = base()
+    crawl_3 = Base()
     try:
         crawl_3.create_folder(folder_name)
         print("=======Created folder successfully======")
@@ -133,7 +133,7 @@ def crawl_ngoai_truyen_1(folder_name, password):
 
 def crawl_ngoai_truyen_2(folder_name, password):
     print("=======Create folder=======")
-    crawl_4 = base()
+    crawl_4 = Base()
     try:
         crawl_4.create_folder(folder_name)
         print("=======Created folder successfully======")
@@ -161,7 +161,7 @@ def crawl_ngoai_truyen_2(folder_name, password):
 
 def crawl_ngoai_truyen_3(folder_name, password):
     print("=======Create folder=======")
-    crawl_5 = base()
+    crawl_5 = Base()
     try:
         crawl_5.create_folder(folder_name)
         print("=======Created folder successfully======")

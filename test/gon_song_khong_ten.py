@@ -13,7 +13,7 @@ from src.locators import gon_song_khong_ten as lo
 #     Worker function to process a chunk of chapters.
 #     chapter_data: list of tuples (url, chapter_number)
 #     """
-#     crawl = base(False)
+#     crawl = Base(False)
 #     try:
 #         crawl.create_folder(folder_name)
 #     except:
@@ -31,38 +31,37 @@ from src.locators import gon_song_khong_ten as lo
 
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False, use_seleniumbase=True)
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(f"Error creating folder: {e}")
+    with Base(False, use_seleniumbase=True) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
 
-    # chapters_list = []
+        # chapters_list = []
 
-    for i in range (1, 92):
-        main_url = f"https://lantruyen.vn/gon-song-khong-ten-9833.html?chuong={i}"
-        crawl.go_to_webpage("https://www.google.com")
-        crawl.wait_for_page_load()
-        crawl.go_to_webpage(main_url)
-        # crawl.wait_for_page_load(5)
-        source = crawl.get_page_source()
-        soup = BeautifulSoup(source, 'html.parser')
+        for i in range (1, 92):
+            main_url = f"https://lantruyen.vn/gon-song-khong-ten-9833.html?chuong={i}"
+            crawl.go_to_webpage("https://www.google.com")
+            crawl.wait_for_page_load()
+            crawl.go_to_webpage(main_url)
+            # crawl.wait_for_page_load(5)
+            source = crawl.get_page_source()
+            soup = BeautifulSoup(source, 'html.parser')
 
-        # source = crawl.get_page_source()
-        # soup = BeautifulSoup(source, 'html.parser')
+            # source = crawl.get_page_source()
+            # soup = BeautifulSoup(source, 'html.parser')
 
-        # # 3. Find your element (using the CSS selector we discussed earlier)
-        title = soup.select_one(lo.chapter_title[1])
-        title_text = title.get_text(separator='\n', strip=True)
-        content = soup.select_one(lo.chapter_content[1])
-        content_text = content.get_text(separator='\n', strip=True)
+            # # 3. Find your element (using the CSS selector we discussed earlier)
+            title = soup.select_one(lo.chapter_title[1])
+            title_text = title.get_text(separator='\n', strip=True)
+            content = soup.select_one(lo.chapter_content[1])
+            content_text = content.get_text(separator='\n', strip=True)
         
-        # title = crawl.get_element_text(lo.chapter_title)
-        # content = crawl.get_element_text(lo.chapter_content)
-        crawl.add_text_to_doc_file(title_text, content_text, "chapter_" + str(i))
+            # title = crawl.get_element_text(lo.chapter_title)
+            # content = crawl.get_element_text(lo.chapter_content)
+            crawl.add_text_to_doc_file(title_text, content_text, "chapter_" + str(i))
     
-    crawl.quit_driver()
 
     # crawl.go_to_webpage(main_url)
     # chap_list = crawl.find_elements(lo.chap_list)

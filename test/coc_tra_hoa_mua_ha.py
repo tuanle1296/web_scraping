@@ -13,12 +13,11 @@ def crawl_worker(chapter_data, folder_name):
     Worker function to process a chunk of chapters.
     chapter_data: list of tuples (url, chapter_number)
     """
-    crawl = base()
-    try:
-        crawl.create_folder(folder_name)
-    except:
-        pass
-    crawl.quit_driver()
+    with Base() as crawl:
+        try:
+            crawl.create_folder(folder_name)
+        except:
+            pass
     
     for chap_url, chap_num in chapter_data:
         print(f"Crawling: {chap_url}")
@@ -31,34 +30,33 @@ def crawl_worker(chapter_data, folder_name):
 
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False)
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(f"Error creating folder: {e}")
+    with Base(False) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
 
-    chapters_list = []
+        chapters_list = []
 
-    main_url = "https://yenlambybluedaisy.com/2021/09/30/hd-coc-tra-hoa-ngay-ha-bat-tinh-chu-dich-lao-ban-nuong/"
+        main_url = "https://yenlambybluedaisy.com/2021/09/30/hd-coc-tra-hoa-ngay-ha-bat-tinh-chu-dich-lao-ban-nuong/"
     
-    crawl.go_to_webpage(main_url)
-    crawl.wait_for_page_load(10)
-    chap_list = crawl.find_elements(lo.chap_list)
-    # urls_list = crawl.find_elements(lo.a_tag, chap_list)
-    chapters_list = []
-    forbidden_words = ["https://wp.me/pckE4X-1jr", "https://wp.me/pckE4X-1jz", "https://wp.me/pckE4X-1jH", "https://wp.me/pckE4X-1kb", "https://wp.me/pckE4X-1k5"]
+        crawl.go_to_webpage(main_url)
+        crawl.wait_for_page_load(10)
+        chap_list = crawl.find_elements(lo.chap_list)
+        # urls_list = crawl.find_elements(lo.a_tag, chap_list)
+        chapters_list = []
+        forbidden_words = ["https://wp.me/pckE4X-1jr", "https://wp.me/pckE4X-1jz", "https://wp.me/pckE4X-1jH", "https://wp.me/pckE4X-1kb", "https://wp.me/pckE4X-1k5"]
 
-    for chap in chap_list:
-        anchors = crawl.find_elements(lo.a_tag, chap)
-        for anchor in anchors:
-            href = crawl.get_attribute_from_element(anchor, "href")
-            if href and not any(word in href for word in forbidden_words):
-                chapters_list.append(href)
+        for chap in chap_list:
+            anchors = crawl.find_elements(lo.a_tag, chap)
+            for anchor in anchors:
+                href = crawl.get_attribute_from_element(anchor, "href")
+                if href and not any(word in href for word in forbidden_words):
+                    chapters_list.append(href)
 
-        # Dọn dẹp danh sách: Xóa trùng lặp nhưng vẫn giữ nguyên thứ tự chương
-        chapters_list = list(dict.fromkeys(chapters_list))        
-    crawl.quit_driver()  # Close the initial driver
+            # Dọn dẹp danh sách: Xóa trùng lặp nhưng vẫn giữ nguyên thứ tự chương
+            chapters_list = list(dict.fromkeys(chapters_list))        
 
     # Prepare data: list of (url, chapter_number)
     indexed_chapters = []

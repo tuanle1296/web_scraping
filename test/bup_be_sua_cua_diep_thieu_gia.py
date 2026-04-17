@@ -12,13 +12,12 @@ def crawl_worker(chapter_data, folder_name):
     Worker function to process a chunk of chapters.
     chapter_data: list of tuples (url, chapter_number)
     """
-    crawl = base()
-    try:
-        crawl.create_folder(folder_name)
-    except:
-        pass
+    with Base() as crawl:
+        try:
+            crawl.create_folder(folder_name)
+        except:
+            pass
 
-    crawl.quit_driver()  # Close browser immediately as we use API for crawling
     
     failed_chapters = []
     for chap_url, chap_num in chapter_data:
@@ -39,29 +38,28 @@ def crawl_worker(chapter_data, folder_name):
 
 def main(folder_name):
     print("=======Create folder=======")
-    crawl = base(False)
-    try:
-        crawl.create_folder(folder_name)
-        print("=======Created folder successfully======")
-    except Exception as e:
-        print(f"Error creating folder: {e}")
+    with Base(False) as crawl:
+        try:
+            crawl.create_folder(folder_name)
+            print("=======Created folder successfully======")
+        except Exception as e:
+            print(f"Error creating folder: {e}")
 
-    forbidden_words = ["page"]
-    chapters_list = []
-    for i in range (1, 4):
-        main_url = f"https://docsach24.co/e-book/bup-be-sua-cua-diep-thieu-gia-780.html?page={i}"
+        forbidden_words = ["page"]
+        chapters_list = []
+        for i in range (1, 4):
+            main_url = f"https://docsach24.co/e-book/bup-be-sua-cua-diep-thieu-gia-780.html?page={i}"
     
-        crawl.go_to_webpage(main_url)
-        crawl.wait_for_page_load(10)
-        crawl.sleep(3)
-        chap_list = crawl.find_elements(lo.chap_list)
-        for chap in chap_list:
-            anchors = crawl.find_elements(lo.a_tag, chap)
-            for anchor in anchors:
-                url = crawl.get_attribute_from_element(anchor, "href")
-                if url and not any(word in url for word in forbidden_words):
-                    chapters_list.append(url)
-    crawl.quit_driver()  # Close the initial driver
+            crawl.go_to_webpage(main_url)
+            crawl.wait_for_page_load(10)
+            crawl.sleep(3)
+            chap_list = crawl.find_elements(lo.chap_list)
+            for chap in chap_list:
+                anchors = crawl.find_elements(lo.a_tag, chap)
+                for anchor in anchors:
+                    url = crawl.get_attribute_from_element(anchor, "href")
+                    if url and not any(word in url for word in forbidden_words):
+                        chapters_list.append(url)
 
     # Prepare data: list of (url, chapter_number)
     indexed_chapters = []

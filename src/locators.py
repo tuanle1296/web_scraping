@@ -86,13 +86,6 @@ class chuyen_cu_kinh_cang:
     chapter_link : str = "h2.entry-title a[href]"
 
 @dataclass()
-class co_truong_cat_canh_di:
-    chapter_blocks : tuple[By, str] = (By.XPATH, "//div[@id='TIEU-DE']//span[text()='Mục lục']/../../../..")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass()
 class tulip_trong_gio:
     beginning_chapter_block : tuple[By, str] = (By.XPATH, "//strong[text()='Danh sách chương: ']/..")
     endding_chapter_block : tuple[By, str] = (By.XPATH, "p[text()='Hoàn toàn văn.']")
@@ -110,72 +103,11 @@ class cung_anh_di_den_tan_cung_the_gioi:
     iframe : tuple[By, str] = (By.XPATH, "//iframe[contains(@id, 'epubjs-view')]")
 
 @dataclass()
-class buc_tuong_doi_mat_dau_goi:
-    chap_urls_list : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content .wp-block-table")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    password_field : tuple[By, str] = (By.CSS_SELECTOR, "input[type='password']")
-    submit_password_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-    invalid_password_message : tuple[By, str] = (By.CSS_SELECTOR, ".post-password-form-invalid-password")
-    chap_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
-    chap_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass()
-class dung_ai_noi_voi_anh_ay_toi_con_yeu:
-    chap_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chap_header : tuple[By, str] = (By.CSS_SELECTOR, "header.entry-header")
-
-@dataclass
-class suong_mo_tren_dao_hong_kong:
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-
-    
-@dataclass
-class ba_nam_roi_lai_ba_nam:
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-@dataclass
-class huong_son_tam_phong:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-
-@dataclass()
 class bon_thang_yeu_chua_du:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, ".book-nav ul.menu")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.page-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.content.gs-book")
-
-@dataclass()
-class thich:
-    chap_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.post-title")
-
-@dataclass()
-class bay_nam_van_ngoanh_ve_phuong_bac:
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".post-content.clear")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-
-@dataclass
-class canh_dong_hoang_vu:
-    chap_list : tuple[By, str] = (By.XPATH, "//a[contains(text(), 'Chương')]")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
-@dataclass
-class banh_rang:
-    chap_list : tuple[By, str] = (By.XPATH, "//a[contains(text(), 'Chương')]")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
 
 @dataclass
 class ngo_cu_tinh_sau:
@@ -187,66 +119,11 @@ class ngo_cu_tinh_sau:
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button.password-submit-btn")
 
 @dataclass
-class trang_sang_ngan_van_dam:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table.is-style-stripes")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
 class sa_doa:
     chapter_list_button : tuple[By, str] = (By.XPATH, "//button[@role='tab' and contains(text(), 'Danh sách chương')]")
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "a.p-2")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.text-2xl")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.bg-white.p-6")
-
-@dataclass
-class lo_hen_cung_xuan:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table.is-style-stripes")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
-@dataclass
-class bo_tat_dien:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table.is-style-stripes")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class jolina_land:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.container")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass()
-class dam_lay_mua_xuan:
-    header : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
-    content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    list_chap : tuple[By, str] = (By.CSS_SELECTOR, "p.has-text-align-center")
-    chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
-
-@dataclass
-class dau_tay:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "p[style='text-align:center']")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
-@dataclass()
-class than_mat_khang_khit:
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "p.has-text-align-center")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
 
 @dataclass
 class sac_mau_hon_nhan:
@@ -271,15 +148,6 @@ class khach_tro:
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input#passwordInput")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button[type='submit']")
 
-@dataclass
-class say_dam:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
 @dataclass()
 class nguoi_dep_mau_lua:
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
@@ -288,59 +156,17 @@ class nguoi_dep_mau_lua:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
 
 @dataclass
-class bien_thoi_gian:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
 class tinh_cam_sau_nang:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.row.book-list.list-chap")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "div.rv-chapt-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
 
-@dataclass
-class mua_he_hoang_da:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass()
-class binh_minh_mau_do:
-    header : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    list_chap : tuple[By, str] = (By.CSS_SELECTOR, "p.has-text-align-center")
-    chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
-
 @dataclass()
 class hoang_hon_mong_manh:
     header : tuple[By, str] = (By.CSS_SELECTOR, ".page-title")
     content : tuple[By, str] = (By.CSS_SELECTOR, "div.content.gs-book")
     list_chap : tuple[By, str] = (By.CSS_SELECTOR, ".book-nav ul.menu")
-    chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
-
-@dataclass()
-class tinh_yeu_chet_tiet_nay:
-    header : tuple[By, str] = (By.CSS_SELECTOR, ".wp-block-post-title")
-    content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    list_chap : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
-
-@dataclass
-class cuc_han_tren_bien:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table.is-style-stripes")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass()
-class cuc_non_trong_tam_mat:
-    header : tuple[By, str] = (By.CSS_SELECTOR, ".wp-block-post-title")
-    content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    list_chap : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
     chap_tag : tuple[By, str] = (By.TAG_NAME, "a")
 
 @dataclass
@@ -351,33 +177,10 @@ class xuan_muon:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
 
 @dataclass
-class dong_tam_vi_em:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class tinh_yeu_cua_chung_ta:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
-@dataclass
 class ngay_doc_lap_cua_toi:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.wp-block-post-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class that_hon:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
 
 @dataclass
@@ -387,27 +190,6 @@ class hoa_hong_ky_uc:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#chuong_content")
 
 @dataclass
-class hanh_phuc_la_khi_yeu_anh:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class the_gioi_tang_em_cho_anh:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class anh_biet_gio_den_tu_dau:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
 class nam_thu_hai_sau_khi_ket_hon:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.mvd-san-pham-show-dsc-content")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
@@ -415,95 +197,11 @@ class nam_thu_hai_sau_khi_ket_hon:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
 
 @dataclass
-class den_sang_khi_nguoi_den:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class toa_thanh_tren_khong:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, ".mvd-san-pham-show-dsc-content-box")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class hoa_baby:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class nui_non_hai_duong:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, ".mvd-san-pham-show-dsc-content-box")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class chi_yeu_minh_em:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class thien_huong_nguoi_mu:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.wp-block-group.has-text-color")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class chi_la_da_nghiem_tuc_voi_em:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table.is-style-stripes")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class em_thay_nui_xanh:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
 class than_linh:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#chapter-list")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".chapter-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.truyen")
-
-@dataclass
-class anh_sang_nhat:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class em_la_tat_ca_nhung_gi_anh_khao_khat:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.post-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.post-content")
-
-@dataclass
-class cm_anh_duong:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content div")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-body")
-
-@dataclass
-class minh_nguyet_lac_nga_hoai:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
 
 @dataclass
 class phung_thanh:
@@ -517,13 +215,6 @@ class troi_dat_tac_thanh:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.page-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.content.gs-book")
-
-@dataclass
-class dau_the_nao_cung_muon_o_ben_nhau:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
 
 @dataclass
 class mr_da_dieu_cua_toi:
@@ -540,15 +231,6 @@ class coc_tra_hoa_mua_ha:
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
 
-@dataclass
-class doan_tau_trong_suong_mu:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table.is-style-stripes")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.wp-block-group.has-text-align-justify")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
 @dataclass()
 class cam_do_chi_mang:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, ".book-nav ul.menu")
@@ -564,82 +246,11 @@ class cuoc_chien_chinh_doat:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.content.gs-book")
 
 @dataclass
-class hon_ca_hon_nhan:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, ".mvd-san-pham-show-dsc-content-box")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-    signin_signup_link : tuple[By, str] = (By.CSS_SELECTOR, ".hydrosite-mong-truyen-user-text")
-    username_signin_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='username']")
-    password_signin_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='password']")
-    signin_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='dangnhap']")   
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input.password-input")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button#btnSubmitPassword")
-
-@dataclass
-class anh_trang_roi_vao_be_tinh:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.wp-block-columns p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
-@dataclass
-class nguoi_tinh_tri_mang:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.post-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.post-content")
-
-@dataclass
 class hao_mon_kinh_mong_2:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "ul.list")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h2.font-weight-normal")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
-
-@dataclass
-class tro_ve_phuong_bac:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, ".wp-block-query")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class nguoi_den_tu_bong_toi:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.post-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.post-content")
-
-@dataclass
-class dong_long:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class chiec_coi_trang:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.post-content h4")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.post-content")
-
-@dataclass
-class du_am_van_con_thoang_ben_tai:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class doi_mua_tanh:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
 
 @dataclass
 class nu_hon_cuu_roi:
@@ -656,40 +267,11 @@ class chan_troi_goc_be:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
 
 @dataclass
-class da_do:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class do_quyen_khong_tan:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class tam_giac_mua_he:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    img_tag : tuple[By, str] = (By.TAG_NAME, "img")
-
-@dataclass
 class tinh_bien:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#chapter-list")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.truyen")
-
-@dataclass
-class ao_mu_chinh_te:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
 
 @dataclass
 class gon_gio_dem:
@@ -706,101 +288,8 @@ class yen_lang_cho_ba_bua_com:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.truyen")
 
 @dataclass
-class ngay_mai_van_con_yeu_em:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class tron_thoat_duoi_day_bien:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class dau_lau_hoa_hong:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class bien_ca_duoi_troi_sao:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table.is-style-stripes")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-body")
-
-@dataclass
 class gon_song_khong_ten:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.mvd-san-pham-show-dsc-content")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class me_tinh_berlin:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class khong_biet_sao_yeu_em:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class vung_trom_khong_the_giau:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class huou_lac_loi:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class khong852:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class quy_loc:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
-@dataclass
-class mua_xuan_den_muon:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class thoi_gian_nhu_hen:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class loi_hua_cua_anh_la_bien_xanh_cua_em:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
@@ -811,22 +300,6 @@ class mot_toa_thanh_dang_cho_anh:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "div.rv-chapt-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
-
-@dataclass
-class o_lai_trong_long_anh:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.container")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-
-@dataclass
-class chi_ngoan_voi_em:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
 
 @dataclass()
 class tram_quang_theo_huong_nam:
@@ -856,48 +329,6 @@ class qua_ngot_nam_thang:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
 
 @dataclass
-class tham_luyen:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class em_chi_thich_mat_cua_anh:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class luoi_dao_diu_dang:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
-class may_bay_qua_troi_em_qua_tim_toi:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content h4")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class cap_doi_nong_chay:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
-class phu_hieu_em_la_cua_anh:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div#result-danh-sach-chuong")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-
-@dataclass
 class anh_tren_trang_giay:
     chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.row.book-list.list-chap")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
@@ -905,40 +336,11 @@ class anh_tren_trang_giay:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
 
 @dataclass
-class cung_chieu_doc_nhat:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-
-@dataclass
 class to_tinh:
     chap_list : tuple[By, str] = (By.XPATH, "//div[@class='book-list story-details list-chap']")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "div.rv-chapt-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
-
-@dataclass
-class o_chan_co_ay_rat_mem_mai:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p[class='has-text-align-center wp-block-paragraph']")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    
-
-@dataclass
-class bat_em_vao_trong:
-    accept_warning_btn : tuple[By, str] = (By.CSS_SELECTOR, "div.gioi-han-do-tuoi-warning-box a.gioi-han-do-tuoi-btn-continue")
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, ".mvd-san-pham-show-dsc-content-box")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, ".mdv-san-pham-detail-chuong-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div#noi_dung_truyen")
-    signin_signup_link : tuple[By, str] = (By.CSS_SELECTOR, ".hydrosite-mong-truyen-user-text")
-    username_signin_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='username']")
-    password_signin_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='password']")
-    signin_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='dangnhap']")   
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input.password-input")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button#btnSubmitPassword")
 
 @dataclass()
 class vo_nho_mang_thai_ho_cua_dai_thuc:
@@ -960,21 +362,6 @@ class em_chi_minh_anh_nuong_chieu_thoi:
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "div.rv-chapt-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-c")
     
-@dataclass
-class hom_qua_vui_ve:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
-@dataclass
-class buoc_vao_giac_mong_ca_vang:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "figure.wp-block-table")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
 
 @dataclass
 class xin_em_o_lai_ben_anh:
@@ -982,24 +369,6 @@ class xin_em_o_lai_ben_anh:
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.truyen")
-
-@dataclass
-class cung_em_ngam_sao:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p[class='has-text-align-center wp-block-paragraph']")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
-
-@dataclass
-class mot_dong_xu:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, ".entry-content")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
 
 @dataclass
 class chech_huong:
