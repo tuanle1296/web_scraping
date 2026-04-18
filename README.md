@@ -17,7 +17,8 @@ This project provides a robust framework for web scraping using **Selenium**, **
 
 ## 📁 Project Structure
 - `src/base_functions.py`: The core `Base` class containing all automation and extraction logic.
-- `src/locators.py`: Site-specific configurations, selectors, and credentials using `dataclasses`.
+- `src/newlocators.py`: Site-specific configurations, selectors, and credentials using `dataclasses`.
+- `src/locators.py`: Legacy of site-specific configurations, selectors, and credentials using `dataclasses`.
 - `pyproject.toml`: Managed by **`uv`**, containing dependencies (`selenium`, `seleniumbase`, `curl-cffi`, `python-docx`).
 - `downloaded_files/`: Default output directory for scraped content.
 - `GEMINI.md`: Detailed project standards and coding conventions.
