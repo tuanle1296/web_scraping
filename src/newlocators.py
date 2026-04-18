@@ -35,3 +35,12 @@ class wordpress:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
+
+@dataclass
+class trichtinhlau:
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "li.name-breadcum")
+    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input#passwordInput")
+    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button[type='submit']")

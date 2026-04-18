@@ -5,17 +5,14 @@ import docx
 import time
 from docx.shared import Inches
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.common.exceptions import ElementClickInterceptedException, NoSuchElementException, StaleElementReferenceException, TimeoutException
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import requests
 from selenium.webdriver.common.keys import Keys
-import pytesseract
 from curl_cffi import requests as curl_requests
-from PIL import Image, ImageOps
 import io
 import os
 from seleniumbase import Driver
@@ -699,25 +696,3 @@ class Base:
             crawl.quit_driver()
         """
         self.driver.quit()
-
-    def extract_images_to_file(self, elements: List[WebElement], file_name: str) -> None:
-        """
-        Scans images with OCR and saves results to a Word file.
-        
-        Example:
-            crawl.extract_images_to_file(img_list, "ocr_output")
-        """
-        if not elements or not self.path: return
-        file_path = os.path.join(self.path, f"{file_name}.docx")
-        document = docx.Document(file_path) if os.path.exists(file_path) else docx.Document()
-        for index, img in enumerate(elements, start=1):
-            try:
-                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", img)
-                time.sleep(1.5)
-                image = ImageOps.grayscale(Image.open(io.BytesIO(img.screenshot_as_png)))
-                w, h = image.size
-                image = image.resize((w * 2, h * 2), Image.Resampling.LANCZOS)
-                text = pytesseract.image_to_string(image, lang='vie')
-                if text.strip(): document.add_paragraph(text.strip())
-            except Exception as e: print(f"OCR Error at image {index}: {e}")
-        document.save(file_path)
