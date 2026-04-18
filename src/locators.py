@@ -139,15 +139,6 @@ class sac_mau_am:
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.truyen")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter-title")
 
-@dataclass
-class khach_tro:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.chapter")
-    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
-    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
-    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "li.name-breadcum")
-    password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input#passwordInput")
-    password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button[type='submit']")
-
 @dataclass()
 class nguoi_dep_mau_lua:
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
