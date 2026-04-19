@@ -29,7 +29,8 @@ class mongtruyen:
 
 @dataclass
 class wordpress:
-    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
+    p_chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content p")
+    normal_chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")

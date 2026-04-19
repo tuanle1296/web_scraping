@@ -10,8 +10,8 @@ from src.newlocators import wordpress as lo
 from src.drive_manager import DriveManager
 
 
-storyName = "loi_ra_o_cuoi_con_duong"
-main_url = "https://quythanhduongjcy.wordpress.com/edit-loi-ra-o-cuoi-con-duong-sam-man/"
+storyName = "tuyet_bien_ngap_ngan"
+main_url = "https://luclacnho2810.wordpress.com/tuyet-bien-ngap-ngan-nghiem-tuyet-gioi-2/"
 forbidden_words = []
 passwords_dict = {}
 passwords_string = ""
@@ -84,14 +84,29 @@ def main(folder_name):
             print(f"Page {main_url} did not load correctly.")
             return
         
-        chap_list = crawl.find_elements(lo.chap_list)
-
+        # 1. Try finding anchors in p_chap_list first
+        chap_list = crawl.find_elements(lo.p_chap_list)
         for chap in chap_list:
             anchors = crawl.find_elements(lo.a_tag, chap)
             for anchor in anchors:
                 url = crawl.get_attribute_from_element(anchor, "href")
                 if url and not any(word in url for word in forbidden_words) and (url not in chapters_list):
                     chapters_list.append(url)
+        
+        # 2. If no chapters found, try finding anchors in normal_chap_list
+        if not chapters_list:
+            print("No links found in p_chap_list, trying normal_chap_list...")
+            normal_chaps = crawl.find_elements(lo.normal_chap_list)
+            for chap in normal_chaps:
+                anchors = crawl.find_elements(lo.a_tag, chap)
+                for anchor in anchors:
+                    url = crawl.get_attribute_from_element(anchor, "href")
+                    if url and not any(word in url for word in forbidden_words) and (url not in chapters_list):
+                        chapters_list.append(url)
+
+    if not chapters_list:
+        print("Error: No chapters found to crawl. Exiting.")
+        return
 
     # Prepare data: list of (url, chapter_number)
     indexed_chapters = []
