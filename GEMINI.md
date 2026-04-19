@@ -22,10 +22,16 @@
 - **Data Safety:** Kiểm tra sự tồn tại của element (`try-except` hoặc check length) trước khi extract để tránh crash giữa chừng.
 - **Resource Management:** Luôn đảm bảo đóng Browser (`driver.quit()`) bằng block `try...finally` hoặc context manager.
 
-## 4. Output & Logging
+## 4. Output, Archiving & Integration
 - **Logging:** Dùng `print()` thay vì `logging()`.
 - **Storage:** File tải về hoặc export phải được lưu vào thư mục `downloaded_files/`.
-- **OCR:** Khi dùng Pytesseract, luôn xử lý ảnh qua Pillow (grayscale, resize) trước khi nhận diện để tăng độ chính xác.
+- **Archiving:** Khi cần nén dữ liệu, sử dụng method `zip_folder()` trong `Base` class.
+- **Email:** Sử dụng `MailManager` trong `src/mail_manager.py` để gửi file zip qua Gmail. Yêu cầu dùng App Password.
+- **Google Drive:** Sử dụng `DriveManager` trong `src/drive_manager.py` để upload file lên Drive. Yêu cầu setup `credentials.json`, `token.json` và lưu ID folder trong `config.json`.
+
+## 5. Security
+- Không bao giờ commit `credentials.json`, `token.json`, `config.json`, hoặc App Passwords lên Git.
+- Luôn đảm bảo các file này được liệt kê trong `.gitignore`.
 
 ## 5. Workflow
 - Trước khi viết script mới, hãy kiểm tra các utility đã có trong `src/` để tái sử dụng.

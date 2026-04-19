@@ -1,5 +1,6 @@
 import pathlib
 import re
+import shutil
 from typing import Literal, Tuple, Optional, List, Union, Any
 import docx
 import time
@@ -196,6 +197,24 @@ class Base:
                 os.remove(file)
         except Exception:
             pass
+
+    def zip_folder(self, folder_name: str) -> str:
+        """
+        Zips a folder based on its name and returns the path to the resulting zip file.
+        The zip file will be created at the same level as the input folder.
+        
+        Example:
+            zip_file = crawl.zip_folder("downloaded_files/my_novel")
+        """
+        self.set_path(folder_name)
+        if not self.path or not os.path.exists(self.path):
+            raise FileNotFoundError(f"Folder not found: {self.path}")
+            
+        # shutil.make_archive adds the .zip extension automatically
+        # It creates the archive at the same level as the folder being zipped
+        archive_path = shutil.make_archive(self.path, 'zip', self.path)
+        print(f"Folder {self.path} zipped successfully to {archive_path}")
+        return archive_path
 
     def define_img_name(self, title: str) -> str:
         """

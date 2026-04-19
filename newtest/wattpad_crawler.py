@@ -3,16 +3,25 @@ import os
 import math
 import re
 import time
+import json
 import concurrent.futures
 from curl_cffi import requests
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
+from src.drive_manager import DriveManager
+
 
 storyName = "anh_o_phia_nam_dam_may"
 main_url = "https://www.wattpad.com/1347858407-full-anh-%E1%BB%9F-ph%C3%ADa-nam-%C4%91%C3%A1m-m%C3%A2y-c%E1%BA%A3nh-h%C3%A0nh-l%E1%BB%9Di-%C4%91%E1%BB%81"
 
+def get_config_folder_id():
+    try:
+        with open("config.json", "r") as f:
+            return json.load(f).get("google_drive_folder_id")
+    except Exception:
+        return None
 
 def get_story_toc(start_url):
     """
@@ -72,7 +81,6 @@ def crawl_worker(chapter_data, folder_name):
                     
                     # Check if Wattpad accidentally returned JSON
                     if raw_text.strip().startswith("{"):
-                        import json
                         try:
                             data = json.loads(raw_text)
                             raw_html = data.get("text", raw_text) # Extract the text if it's JSON
@@ -157,6 +165,23 @@ def main(folder_name):
         executor.map(lambda chunk: crawl_worker(chunk, folder_name), chunks)
         
     print("======= All threads finished =======")
+    print(f"===========Zipping {storyName} folder===========")
+    zip_path = None
+    try:
+        with Base(True) as zip_crawl:
+            zip_path = zip_crawl.zip_folder(storyName)
+    except Exception as e:
+        print(f"Folder {storyName} zip unsuccessfully: {e}")
+        return
+    
+    if zip_path:
+        print(f"Zip folder {storyName} completed: {zip_path}")
+        print("=======Uploading to Google Drive=======")
+        try:
+            drive = DriveManager()
+            drive.upload_zip(zip_path, folder_id=get_config_folder_id())
+        except Exception as e:
+            print(f"Upload to Google Drive failed: {e}")
 
 
 if __name__ == '__main__':

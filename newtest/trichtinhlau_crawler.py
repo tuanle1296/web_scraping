@@ -1,11 +1,22 @@
 import sys
 import os
-import threading
+import concurrent.futures
 import math
+import json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.base_functions import *
 from src.newlocators import trichtinhlau as lo
+from src.drive_manager import DriveManager
 
+
+storyName = "khach_tro"
+
+def get_config_folder_id():
+    try:
+        with open("config.json", "r") as f:
+            return json.load(f).get("google_drive_folder_id")
+    except Exception:
+        return None
 
 def crawl_worker(chapter_data, folder_name):
     """
@@ -94,27 +105,40 @@ def main(folder_name):
         print("Error: No chapters found!")
         return
 
-    # Prepare indexed data for threading
-    indexed_chapters = [(url, i + 1) for i, url in enumerate(chapters_list)]
+    # Prepare data: list of (url, chapter_number)
+    indexed_chapters = []
+    for i, url in enumerate(chapters_list):
+        indexed_chapters.append((url, i + 1))
 
     # Split into chunks for parallel processing
-    num_threads = 2  # Adjust as needed (each thread = 1 browser)
+    num_threads = 3  # Adjust number of threads as needed
     chunk_size = math.ceil(len(indexed_chapters) / num_threads)
     chunks = [indexed_chapters[i:i + chunk_size] for i in range(0, len(indexed_chapters), chunk_size)]
 
-    # Step 2: Start worker threads, each launching its own browser
-    threads = []
-    print(f"Starting {len(chunks)} parallel browser threads...")
-    for chunk in chunks:
-        t = threading.Thread(target=crawl_worker, args=(chunk, folder_name))
-        threads.append(t)
-        t.start()
-
-    for t in threads:
-        t.join()
+    print(f"Starting {num_threads} threads...")
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
+        executor.map(lambda chunk: crawl_worker(chunk, folder_name), chunks)
+    
     print("=======All parallel processes finished=======")
+    print(f"===========Zipping {storyName} folder===========")
+    zip_path = None
+    try:
+        with Base(True) as zip_crawl:
+            zip_path = zip_crawl.zip_folder(storyName)
+    except Exception as e:
+        print(f"Folder {storyName} zip unsuccessfully: {e}")
+        return
+    
+    if zip_path:
+        print(f"Zip folder {storyName} completed: {zip_path}")
+        print("=======Uploading to Google Drive=======")
+        try:
+            drive = DriveManager()
+            drive.upload_zip(zip_path, folder_id=get_config_folder_id())
+        except Exception as e:
+            print(f"Upload to Google Drive failed: {e}")
 
 if __name__ == '__main__':
-    main("khach_tro")
+    main(storyName)
 
 '''Note: run this code using cmd: uv run newtest/trichtinhlau_crawler.py'''

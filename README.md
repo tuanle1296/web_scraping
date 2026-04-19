@@ -14,32 +14,52 @@ This project provides a robust framework for web scraping using **Selenium**, **
   - `get_element_text`: Custom JS-based text extraction that preserves image placeholders (`[IMAGE_MARKER_START]...`) and filters out anti-copy elements (zero-font spans).
   - `crawl_text_from_soup`: BeautifulSoup-based extraction with image marker support.
 - **Content Export**: Automated export to `.docx` files with image downloading and embedding.
+- **File Management & Archiving**:
+  - `zip_folder`: Built-in folder zipping directly within the `Base` class.
+- **Cloud Integrations**:
+  - **Gmail**: Automated sending of zip attachments via `MailManager`.
+  - **Google Drive**: Automated file uploads to specific folders via `DriveManager`.
 
 ## 📁 Project Structure
-- `src/base_functions.py`: The core `Base` class containing all automation and extraction logic.
+- `src/base_functions.py`: The core `Base` class (Automation, Scraping, Zipping).
+- `src/mail_manager.py`: Gmail integration for sending zip files.
+- `src/drive_manager.py`: Google Drive API integration for cloud storage.
 - `src/newlocators.py`: Site-specific configurations, selectors, and credentials using `dataclasses`.
-- `src/locators.py`: Legacy of site-specific configurations, selectors, and credentials using `dataclasses`.
-- `pyproject.toml`: Managed by **`uv`**, containing dependencies (`selenium`, `seleniumbase`, `curl-cffi`, `python-docx`).
-- `downloaded_files/`: Default output directory for scraped content.
-- `GEMINI.md`: Detailed project standards and coding conventions.
+- `credentials.json`: (User-provided) Google API credentials.
+- `token.json`: (Auto-generated) Google OAuth session token.
+- `config.json`: (User-provided) External IDs (e.g., Google Drive Folder ID).
 
 ## 🛠️ Usage Example
-The `Base` class supports context manager usage for automatic browser cleanup:
-
+### Zipping and Uploading to Drive
 ```python
+import json
 from src.base_functions import Base
-from selenium.webdriver.common.by import By
+from src.drive_manager import DriveManager
 
-# Initialize with SeleniumBase UC Mode
-with Base(use_seleniumbase=True, is_headless_mode=False) as crawl:
-    crawl.go_to_webpage("https://example-novel-site.com", bypass_cloudflare=True)
-    crawl.create_folder("Novel_Title")
-    
-    # Extract text while preserving image markers
-    content = crawl.get_element_text((By.CLASS_NAME, "chapter-content"))
-    
-    # Save to Word document
-    crawl.add_text_to_doc_file("Chapter 1", content)
+# 1. Scrape and Zip
+with Base() as crawl:
+    # ... scraping logic ...
+    zip_path = crawl.zip_folder("my_scraped_data")
+
+# 2. Upload to Drive using config.json
+with open("config.json", "r") as f:
+    folder_id = json.load(f).get("google_drive_folder_id")
+
+drive = DriveManager(credentials_path="credentials.json")
+drive.upload_zip(zip_path, folder_id=folder_id)
+```
+
+### Sending via Gmail
+```python
+from src.mail_manager import MailManager
+
+mailer = MailManager("your_email@gmail.com", "your_app_password")
+mailer.send_email_with_zip(
+    receiver_email="target@gmail.com",
+    subject="Scraped Data",
+    body="Attached is the zipped content.",
+    zip_file_path="my_scraped_data.zip"
+)
 ```
 
 ## 🤖 AI Context & Coding Standards (Mandatory)

@@ -1,12 +1,14 @@
 import sys
 import os
 import math
+import json
 
 import concurrent.futures
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
 from src.newlocators import mongtruyen as lo
+from src.drive_manager import DriveManager
 
 
 storyName = "ca_khong_co_chan"
@@ -16,6 +18,14 @@ username = "tuantest"
 password_signin = "04121996"
 passwords_dict = {}
 passwords_string = "6868"
+
+
+def get_config_folder_id():
+    try:
+        with open("config.json", "r") as f:
+            return json.load(f).get("google_drive_folder_id")
+    except Exception:
+        return None
 
 
 def crawl_worker(chapter_data, folder_name):
@@ -145,6 +155,24 @@ def main(folder_name):
         executor.map(lambda chunk: crawl_worker(chunk, folder_name), chunks)
         
     print("=======All threads finished=======")
+
+    print(f"===========Zipping {storyName} folder===========")
+    zip_path = None
+    try:
+        with Base(True) as zip_crawl:
+            zip_path = zip_crawl.zip_folder(storyName)
+    except Exception as e:
+        print(f"Folder {storyName} zip unsuccessfully: {e}")
+        return
+    
+    if zip_path:
+        print(f"Zip folder {storyName} completed: {zip_path}")
+        print("=======Uploading to Google Drive=======")
+        try:
+            drive = DriveManager()
+            drive.upload_zip(zip_path, folder_id=get_config_folder_id())
+        except Exception as e:
+            print(f"Upload to Google Drive failed: {e}")
 
 if __name__ == '__main__':
     main(storyName)
