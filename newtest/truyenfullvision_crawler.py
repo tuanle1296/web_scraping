@@ -1,18 +1,25 @@
 import sys
 import os
 import math
+import json
 
 import concurrent.futures
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
 from src.newlocators import truyenfullvision as lo
+from src.drive_manager import DriveManager
 
 
 storyName = "duoi_mai_hien"
 main_url = "https://truyenfull.vision/duoi-mai-hien/"
 
-
+def get_config_folder_id():
+    try:
+        with open("config.json", "r") as f:
+            return json.load(f).get("google_drive_folder_id")
+    except Exception:
+        return None
 
 def crawl_worker(chapter_data, folder_name):
     """
@@ -98,7 +105,7 @@ def main(folder_name):
         indexed_chapters.append((url, i + 1))
 
     # Split into chunks for parallel processing
-    num_threads = 3  # Adjust number of threads as needed
+    num_threads = 5  # Adjust number of threads as needed
     chunk_size = math.ceil(len(indexed_chapters) / num_threads)
     chunks = [indexed_chapters[i:i + chunk_size] for i in range(0, len(indexed_chapters), chunk_size)]
 
@@ -107,6 +114,23 @@ def main(folder_name):
         executor.map(lambda chunk: crawl_worker(chunk, folder_name), chunks)
         
     print("=======All threads finished=======")
+    print(f"===========Zipping {storyName} folder===========")
+    zip_path = None
+    try:
+        with Base(True) as zip_crawl:
+            zip_path = zip_crawl.zip_folder(storyName)
+    except Exception as e:
+        print(f"Folder {storyName} zip unsuccessfully: {e}")
+        return
+    
+    if zip_path:
+        print(f"Zip folder {storyName} completed: {zip_path}")
+        print("=======Uploading to Google Drive=======")
+        try:
+            drive = DriveManager()
+            drive.upload_zip(zip_path, folder_id=get_config_folder_id())
+        except Exception as e:
+            print(f"Upload to Google Drive failed: {e}")
 
 if __name__ == '__main__':
     main(storyName)

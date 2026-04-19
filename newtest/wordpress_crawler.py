@@ -2,10 +2,12 @@ import sys
 import os
 import concurrent.futures
 import math
+import json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
 from src.newlocators import wordpress as lo
+from src.drive_manager import DriveManager
 
 
 storyName = "loi_ra_o_cuoi_con_duong"
@@ -13,6 +15,14 @@ main_url = "https://quythanhduongjcy.wordpress.com/edit-loi-ra-o-cuoi-con-duong-
 forbidden_words = []
 passwords_dict = {}
 passwords_string = ""
+
+
+def get_config_folder_id():
+    try:
+        with open("config.json", "r") as f:
+            return json.load(f).get("google_drive_folder_id")
+    except Exception:
+        return None
 
 
 def crawl_worker(chapter_data, folder_name):
@@ -105,6 +115,23 @@ def main(folder_name):
     with concurrent.futures.ThreadPoolExecutor(max_workers=num_threads) as executor:
         executor.map(lambda chunk: crawl_worker(chunk, folder_name), chunks)
     print("=======All threads finished=======")
+    print(f"===========Zipping {storyName} folder===========")
+    zip_path = None
+    try:
+        with Base(True) as zip_crawl:
+            zip_path = zip_crawl.zip_folder(storyName)
+    except Exception as e:
+        print(f"Folder {storyName} zip unsuccessfully: {e}")
+        return
+    
+    if zip_path:
+        print(f"Zip folder {storyName} completed: {zip_path}")
+        print("=======Uploading to Google Drive=======")
+        try:
+            drive = DriveManager()
+            drive.upload_zip(zip_path, folder_id=get_config_folder_id())
+        except Exception as e:
+            print(f"Upload to Google Drive failed: {e}")
 
 if __name__ == '__main__':
     main(storyName)

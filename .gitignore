@@ -4,3 +4,6 @@ test/__pycache__
 *.docx
 venv/
 *.zip
+credentials.json
+token.json
+config.json
