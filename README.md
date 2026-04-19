@@ -15,13 +15,14 @@ This project provides a robust framework for web scraping using **Selenium**, **
   - `crawl_text_from_soup`: BeautifulSoup-based extraction with image marker support.
 - **Content Export**: Automated export to `.docx` files with image downloading and embedding.
 - **File Management & Archiving**:
-  - `zip_folder`: Built-in folder zipping directly within the `Base` class.
+  - `zip_folder`, `create_folder`, `save_doc`, etc.: Built-in file and directory operations (inherited from `FileManager`).
 - **Cloud Integrations**:
   - **Gmail**: Automated sending of zip attachments via `MailManager`.
-  - **Google Drive**: Automated file uploads to specific folders via `DriveManager`.
+  - **Google Drive**: Automated file uploads to specific folders via `DriveManager`, utilizing `get_config_folder_id` for configuration.
 
 ## 📁 Project Structure
-- `src/base_functions.py`: The core `Base` class (Automation, Scraping, Zipping).
+- `src/base_functions.py`: The core `Base` class (Automation, Scraping).
+- `src/file_manager.py`: `FileManager` class (File/Folder operations, Zipping, config utility).
 - `src/mail_manager.py`: Gmail integration for sending zip files.
 - `src/drive_manager.py`: Google Drive API integration for cloud storage.
 - `src/newlocators.py`: Site-specific configurations, selectors, and credentials using `dataclasses`.
@@ -32,21 +33,19 @@ This project provides a robust framework for web scraping using **Selenium**, **
 ## 🛠️ Usage Example
 ### Zipping and Uploading to Drive
 ```python
-import json
 from src.base_functions import Base
+from src.file_manager import get_config_folder_id
 from src.drive_manager import DriveManager
 
 # 1. Scrape and Zip
 with Base() as crawl:
     # ... scraping logic ...
+    # zip_folder is inherited from FileManager
     zip_path = crawl.zip_folder("my_scraped_data")
 
-# 2. Upload to Drive using config.json
-with open("config.json", "r") as f:
-    folder_id = json.load(f).get("google_drive_folder_id")
-
+# 2. Upload to Drive using utility from file_manager.py
 drive = DriveManager(credentials_path="credentials.json")
-drive.upload_zip(zip_path, folder_id=folder_id)
+drive.upload_zip(zip_path, folder_id=get_config_folder_id())
 ```
 
 ### Sending via Gmail

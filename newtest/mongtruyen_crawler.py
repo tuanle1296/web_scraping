@@ -1,12 +1,12 @@
 import sys
 import os
 import math
-import json
 
 import concurrent.futures
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
+from src.file_manager import get_config_folder_id
 from src.newlocators import mongtruyen as lo
 from src.drive_manager import DriveManager
 
@@ -18,14 +18,6 @@ username = "tuantest"
 password_signin = "04121996"
 passwords_dict = {}
 passwords_string = "6868"
-
-
-def get_config_folder_id():
-    try:
-        with open("config.json", "r") as f:
-            return json.load(f).get("google_drive_folder_id")
-    except Exception:
-        return None
 
 
 def crawl_worker(chapter_data, folder_name):

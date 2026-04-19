@@ -2,21 +2,14 @@ import sys
 import os
 import concurrent.futures
 import math
-import json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.base_functions import *
+from src.file_manager import get_config_folder_id
 from src.newlocators import trichtinhlau as lo
 from src.drive_manager import DriveManager
 
 
 storyName = "khach_tro"
-
-def get_config_folder_id():
-    try:
-        with open("config.json", "r") as f:
-            return json.load(f).get("google_drive_folder_id")
-    except Exception:
-        return None
 
 def crawl_worker(chapter_data, folder_name):
     """
