@@ -25,9 +25,9 @@
 ## 4. Output, Archiving & Integration
 - **Logging:** Dùng `print()` thay vì `logging()`.
 - **Storage:** File tải về hoặc export phải được lưu vào thư mục `downloaded_files/`.
-- **Archiving:** Khi cần nén dữ liệu, sử dụng method `zip_folder()` trong `Base` class.
+- **Archiving:** Khi cần nén dữ liệu, sử dụng method `zip_folder()` (kế thừa từ `FileManager` trong `Base` class).
 - **Email:** Sử dụng `MailManager` trong `src/mail_manager.py` để gửi file zip qua Gmail. Yêu cầu dùng App Password.
-- **Google Drive:** Sử dụng `DriveManager` trong `src/drive_manager.py` để upload file lên Drive. Yêu cầu setup `credentials.json`, `token.json` và lưu ID folder trong `config.json`.
+- **Google Drive:** Sử dụng `DriveManager` trong `src/drive_manager.py` để upload file lên Drive. Sử dụng hàm tiện ích `get_config_folder_id()` từ `src/file_manager.py` để lấy ID folder từ `config.json`.
 
 ## 5. Security
 - Không bao giờ commit `credentials.json`, `token.json`, `config.json`, hoặc App Passwords lên Git.

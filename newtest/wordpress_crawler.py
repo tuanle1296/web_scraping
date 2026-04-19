@@ -2,10 +2,10 @@ import sys
 import os
 import concurrent.futures
 import math
-import json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
+from src.file_manager import get_config_folder_id
 from src.newlocators import wordpress as lo
 from src.drive_manager import DriveManager
 
@@ -15,14 +15,6 @@ main_url = "https://quythanhduongjcy.wordpress.com/edit-loi-ra-o-cuoi-con-duong-
 forbidden_words = []
 passwords_dict = {}
 passwords_string = ""
-
-
-def get_config_folder_id():
-    try:
-        with open("config.json", "r") as f:
-            return json.load(f).get("google_drive_folder_id")
-    except Exception:
-        return None
 
 
 def crawl_worker(chapter_data, folder_name):

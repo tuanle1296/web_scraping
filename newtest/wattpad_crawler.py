@@ -10,18 +10,13 @@ from curl_cffi import requests
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from src.base_functions import *
+from src.file_manager import get_config_folder_id
 from src.drive_manager import DriveManager
 
 
 storyName = "anh_o_phia_nam_dam_may"
 main_url = "https://www.wattpad.com/1347858407-full-anh-%E1%BB%9F-ph%C3%ADa-nam-%C4%91%C3%A1m-m%C3%A2y-c%E1%BA%A3nh-h%C3%A0nh-l%E1%BB%9Di-%C4%91%E1%BB%81"
 
-def get_config_folder_id():
-    try:
-        with open("config.json", "r") as f:
-            return json.load(f).get("google_drive_folder_id")
-    except Exception:
-        return None
 
 def get_story_toc(start_url):
     """
