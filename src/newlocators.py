@@ -45,3 +45,11 @@ class trichtinhlau:
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "li.name-breadcum")
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input#passwordInput")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button[type='submit']")
+
+@dataclass
+class vuaduongotp:
+    chapter_tab : tuple[By, str] = (By.CSS_SELECTOR, "a[href='#tab-chaptter']")
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.list_chapter")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.post_single_desc")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.post_single_title")

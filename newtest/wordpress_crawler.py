@@ -10,9 +10,9 @@ from src.newlocators import wordpress as lo
 from src.drive_manager import DriveManager
 
 
-storyName = "tuyet_bien_ngap_ngan"
-main_url = "https://luclacnho2810.wordpress.com/tuyet-bien-ngap-ngan-nghiem-tuyet-gioi-2/"
-forbidden_words = []
+storyName = "ve_sau_mua_ha_lang_nghe_tuyet_tan"
+main_url = "https://cloudythewhale.wordpress.com/523-2/"
+forbidden_words = ["facebook", "onebook", "ngoai-le"]
 passwords_dict = {}
 passwords_string = ""
 
@@ -78,29 +78,32 @@ def main(folder_name):
 
     chapters_list = []
 
-    with Base(False) as crawl:
+    with Base(True) as crawl:
         crawl.go_to_webpage(main_url)
         if not crawl.wait_for_page_load(10):
             print(f"Page {main_url} did not load correctly.")
             return
         
+        # Use BeautifulSoup to find all anchors much faster than Selenium loops
+        soup = BeautifulSoup(crawl.get_page_source(), "html.parser")
+        
         # 1. Try finding anchors in p_chap_list first
-        chap_list = crawl.find_elements(lo.p_chap_list)
-        for chap in chap_list:
-            anchors = crawl.find_elements(lo.a_tag, chap)
-            for anchor in anchors:
-                url = crawl.get_attribute_from_element(anchor, "href")
+        # lo.p_chap_list is (By.CSS_SELECTOR, "div.entry-content p")
+        entry_content_ps = soup.select(lo.p_chap_list[1])
+        for p in entry_content_ps:
+            for anchor in p.find_all(lo.a_tag[1]):
+                url = anchor.get('href')
                 if url and not any(word in url for word in forbidden_words) and (url not in chapters_list):
                     chapters_list.append(url)
         
         # 2. If no chapters found, try finding anchors in normal_chap_list
+        # lo.normal_chap_list is (By.CSS_SELECTOR, "div.entry-content")
         if not chapters_list:
             print("No links found in p_chap_list, trying normal_chap_list...")
-            normal_chaps = crawl.find_elements(lo.normal_chap_list)
-            for chap in normal_chaps:
-                anchors = crawl.find_elements(lo.a_tag, chap)
-                for anchor in anchors:
-                    url = crawl.get_attribute_from_element(anchor, "href")
+            entry_content = soup.select_one(lo.normal_chap_list[1])
+            if entry_content:
+                for anchor in entry_content.find_all(lo.a_tag[1]):
+                    url = anchor.get('href')
                     if url and not any(word in url for word in forbidden_words) and (url not in chapters_list):
                         chapters_list.append(url)
 

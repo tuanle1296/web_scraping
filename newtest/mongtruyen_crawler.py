@@ -11,8 +11,8 @@ from src.newlocators import mongtruyen as lo
 from src.drive_manager import DriveManager
 
 
-storyName = "ca_khong_co_chan"
-main_url = "https://mongtruyen.com/ca-khong-co-chan.html"
+storyName = "thuy_tinh"
+main_url = "https://mongtruyen.com/thuy-tinh-pha-le.html"
 login_url = "https://mongtruyen.com/dang-nhap.html"
 username = "tuantest"
 password_signin = "04121996"
@@ -25,7 +25,7 @@ def crawl_worker(chapter_data, folder_name):
     Worker function to process a chunk of chapters.
     chapter_data: list of tuples (url, chapter_number)
     """
-    with Base(False) as crawl:
+    with Base(True, timeout=2) as crawl:
         try:
             crawl.set_path(folder_name)
         except Exception as e:

@@ -37,6 +37,7 @@ class Base(FileManager):
                 uc=True,
                 headless=is_headless_mode,
                 no_sandbox=True,
+                disable_gpu=True, # Thêm flag này cho Docker
                 page_load_strategy=page_load_strategy,
                 window_size="1920,1080"
             )
@@ -46,9 +47,10 @@ class Base(FileManager):
             options.add_argument('--deny-permission-prompts')
             if is_headless_mode:
                 options.add_argument('--headless=new')
-            options.page_load_strategy = page_load_strategy
-            options.add_argument('--disable-dev-shm-usage') 
-            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-dev-shm-usage') # Đã có - rất quan trọng
+            options.add_argument('--no-sandbox') # Đã có - rất quan trọng
+            options.add_argument('--disable-gpu') # Thêm flag này
+            options.add_argument('--disable-software-rasterizer') # Thêm flag này
             options.add_argument('--window-size=1920,1080')
                 
             self.driver = webdriver.Chrome(options=options)
