@@ -1,0 +1,20 @@
+services:
+  crawler:
+    build: .
+    # Tăng shm_size là CỰC KỲ QUAN TRỌNG để Chrome không bị crash (vấn đề bộ nhớ dùng chung)
+    shm_size: '2gb'
+    volumes:
+      # Mount thư mục download để file không bị mất khi container dừng
+      - ./downloaded_files:/app/downloaded_files
+      # Nếu bạn có file credentials.json cho Google Drive, hãy mount vào đây
+      # - ./credentials.json:/app/credentials.json
+    environment:
+      # Bạn có thể đưa username/password vào biến môi trường để bảo mật hơn
+      - SCRAPE_USER=tuantest
+      - SCRAPE_PASS=04121996
+    # Giới hạn tài nguyên để không làm treo máy chủ khi chạy đa luồng
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G

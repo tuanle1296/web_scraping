@@ -1,38 +1,43 @@
 # Web Scraping Project Standards
 
 ## 1. Tech Stack & Environment
-- **Core:** Python 3.13+
+- **Core:** Python 3.11+ (Docker compatible)
 - **Package Manager:** `uv` (luôn dùng `uv add <package>` để cài thêm thư viện).
+- **Containerization:** Docker & Docker Compose (Chrome, SeleniumBase, Multithreading).
 - **Scraping:** Selenium & SeleniumBase (cho web động), BeautifulSoup4 & Requests (cho web tĩnh).
-- **Processing:** Pytesseract (OCR), Pillow (Image), python-docx (Export).
-- **Project Structure:** Code chính nằm trong `src/`, test nằm trong `test/`.
+- **Processing:** python-docx (Export), Zip archiving.
+- **Project Structure:** 
+  - `src/`: Core logic & Utilities.
+  - `newtest/`: Scripts chạy Local (Hardcoded).
+  - `docker_test/`: Scripts chạy Docker (CLI Arguments, JSON Passwords).
+  - `passwords/`: Folder chứa file cấu hình mật khẩu JSON.
 
-## 2. Coding Conventions
-- **Style:** Tuân thủ PEP 8.
-- **Naming:** 
-  - Biến/Hàm: `snake_case`.
-  - Class: `PascalCase`.
-  - Hằng số: `UPPER_SNAKE_CASE`.
-- **Type Hinting:** Bắt buộc sử dụng Type Hints cho tất cả tham số hàm và giá trị trả về (ex: `def fetch_data(url: str) -> dict:`).
-- **Documentation:** Mỗi function/class phải có Docstring mô tả mục đích và các tham số.
+## 2. Docker & Deployment Standards
+- **Isolation:** Scripts chạy trong Docker PHẢI sử dụng `argparse` để nhận URL và tên truyện từ dòng lệnh.
+- **Environment Variables:** Sử dụng `os.getenv("SCRAPE_USER")` và `os.getenv("SCRAPE_PASS")` cho thông tin đăng nhập. Giá trị thật được lưu trong file `.env`.
+- **Resource Management (Docker):** Luôn set `shm_size: '2gb'` trong `docker-compose.yml` để tránh crash Chrome khi chạy đa luồng.
+- **Chrome Flags:** Trong Docker, bắt buộc dùng `--no-sandbox`, `--disable-dev-shm-usage`, và `--disable-gpu`.
 
-## 3. Scraping Rules
-- **Anti-Detection:** Ưu tiên dùng `SeleniumBase` với các chế độ bypass bot nếu gặp khó khăn.
+## 3. Password Management
+- **Centralization:** Tất cả mật khẩu truyện phải được gom vào thư mục `passwords/` dưới dạng file `.json`.
+- **JSON Structure:** 
+  - Khóa `"default"`: Mật khẩu mặc định cho toàn bộ chương.
+  - Khóa `"số_chương"`: Mật khẩu riêng cho chương đó (ưu tiên cao hơn default).
+- **Security:** Thư mục `passwords/` và file `.env` KHÔNG ĐƯỢC PHÉP commit lên Git.
+
+## 4. Scraping Rules
+- **Anti-Detection:** Ưu tiên dùng `SeleniumBase` (UC Mode) cho các trang có Cloudflare (như Mongtruyen).
 - **Wait Strategy:** Tuyệt đối không dùng `time.sleep()`. Luôn sử dụng `WebDriverWait` với `expected_conditions` để đợi element.
-- **Data Safety:** Kiểm tra sự tồn tại của element (`try-except` hoặc check length) trước khi extract để tránh crash giữa chừng.
 - **Resource Management:** Luôn đảm bảo đóng Browser (`driver.quit()`) bằng block `try...finally` hoặc context manager.
 
-## 4. Output, Archiving & Integration
-- **Logging:** Dùng `print()` thay vì `logging()`.
-- **Storage:** File tải về hoặc export phải được lưu vào thư mục `downloaded_files/`.
-- **Archiving:** Khi cần nén dữ liệu, sử dụng method `zip_folder()` (kế thừa từ `FileManager` trong `Base` class).
-- **Email:** Sử dụng `MailManager` trong `src/mail_manager.py` để gửi file zip qua Gmail. Yêu cầu dùng App Password.
-- **Google Drive:** Sử dụng `DriveManager` trong `src/drive_manager.py` để upload file lên Drive. Sử dụng hàm tiện ích `get_config_folder_id()` từ `src/file_manager.py` để lấy ID folder từ `config.json`.
+## 5. Output & Integration
+- **Storage:** Kết quả lưu vào `downloaded_files/`.
+- **Google Drive:** Sử dụng `DriveManager` kết hợp với `credentials.json` và `get_config_folder_id()`.
+- **Zipping:** Sử dụng method `zip_folder()` từ class `Base`.
 
-## 5. Security
-- Không bao giờ commit `credentials.json`, `token.json`, `config.json`, hoặc App Passwords lên Git.
-- Luôn đảm bảo các file này được liệt kê trong `.gitignore`.
-
-## 5. Workflow
-- Trước khi viết script mới, hãy kiểm tra các utility đã có trong `src/` để tái sử dụng.
-- Khi tạo file mới, hãy cập nhật `.gitignore` nếu file đó tạo ra dữ liệu rác hoặc log.
+## 6. Security & Git
+- **Ignore List:** Bắt buộc liệt kê các file sau trong `.gitignore`:
+  - `.env` (Chứa bí mật đăng nhập).
+  - `passwords/` (Chứa mật khẩu truyện).
+  - `credentials.json`, `token.json` (Google API).
+  - `downloaded_files/`, `*.docx`, `*.zip`.

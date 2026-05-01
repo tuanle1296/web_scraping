@@ -1,71 +1,55 @@
-# Web Scraping Project (Web Novel Specialist)
+# 🚀 Web Scraping Project (Web Novel Specialist)
 
-A high-level, flexible web automation and scraping framework built in Python 3.13+, specifically optimized for extracting web novels, bypassing anti-bot protections, and generating structured documents.
+---
 
-## 🚀 Overview
-This project provides a robust framework for web scraping using **Selenium**, **SeleniumBase**, and **curl-cffi**. It is designed to handle dynamic content, iframes, and advanced anti-bot measures (like Cloudflare) while providing specialized tools for novel content extraction and `.docx` generation.
+## 🇺🇸 English Version
 
-## ✨ Key Features
-- **Anti-Bot Bypass**: 
-  - `SeleniumBase` (UC Mode) for navigating Cloudflare-protected sites.
-  - `curl-cffi` (impersonate) for standard HTTP scraping that mimics real browsers.
-- **Dynamic Content Handling**: Advanced methods for scrolling, waiting for JS/jQuery conditions, and handling lazy-loaded images.
-- **Novel-Specific Extraction**:
-  - `get_element_text`: Custom JS-based text extraction that preserves image placeholders (`[IMAGE_MARKER_START]...`) and filters out anti-copy elements (zero-font spans).
-  - `crawl_text_from_soup`: BeautifulSoup-based extraction with image marker support.
-- **Content Export**: Automated export to `.docx` files with image downloading and embedding.
-- **File Management & Archiving**:
-  - `zip_folder`, `create_folder`, `save_doc`, etc.: Built-in file and directory operations (inherited from `FileManager`).
-- **Cloud Integrations**:
-  - **Gmail**: Automated sending of zip attachments via `MailManager`.
-  - **Google Drive**: Automated file uploads to specific folders via `DriveManager`, utilizing `get_config_folder_id` for configuration.
+A high-level, flexible web automation and scraping framework built in Python 3.11+, specifically optimized for extracting web novels, bypassing anti-bot protections, and generating structured documents using Docker.
 
-## 📁 Project Structure
-- `src/base_functions.py`: The core `Base` class (Automation, Scraping).
-- `src/file_manager.py`: `FileManager` class (File/Folder operations, Zipping, config utility).
-- `src/mail_manager.py`: Gmail integration for sending zip files.
-- `src/drive_manager.py`: Google Drive API integration for cloud storage.
-- `src/newlocators.py`: Site-specific configurations, selectors, and credentials using `dataclasses`.
-- `credentials.json`: (User-provided) Google API credentials.
-- `token.json`: (Auto-generated) Google OAuth session token.
-- `config.json`: (User-provided) External IDs (e.g., Google Drive Folder ID).
+### ✨ Key Features
+- **Docker-First Architecture**: Run the crawler anywhere without local Python or Chrome installation.
+- **Multithreading**: High-speed scraping using `ThreadPoolExecutor`.
+- **Anti-Bot Bypass**: `SeleniumBase` (UC Mode) and `curl-cffi` to navigate Cloudflare.
+- **Flexible Password Support**: Manage story passwords via central JSON files in the `passwords/` folder.
+- **Cloud Export**: Automatic zipping and uploading to **Google Drive**.
 
-## 🛠️ Usage Example
-### Zipping and Uploading to Drive
-```python
-from src.base_functions import Base
-from src.file_manager import get_config_folder_id
-from src.drive_manager import DriveManager
+### 📁 Project Structure
+- `src/`: Core logic and automation utilities.
+- `docker_test/`: Scripts optimized for Docker with CLI argument support.
+- `newtest/`: Original scripts for local execution.
+- `passwords/`: Centralized JSON password management.
 
-# 1. Scrape and Zip
-with Base() as crawl:
-    # ... scraping logic ...
-    # zip_folder is inherited from FileManager
-    zip_path = crawl.zip_folder("my_scraped_data")
-
-# 2. Upload to Drive using utility from file_manager.py
-drive = DriveManager(credentials_path="credentials.json")
-drive.upload_zip(zip_path, folder_id=get_config_folder_id())
+### 🛠️ How to Run (Docker)
+1. Prepare your `.env` file for credentials (use `SCRAPE_USER` and `SCRAPE_PASS`).
+2. Run via Docker Compose:
+```bash
+docker compose -f docker_test_compose.yml up --build
 ```
+3. To change the story, edit the `command` section in `docker_test_compose.yml` to specify the `--url`, `--name`, and `--pass-file`.
 
-### Sending via Gmail
-```python
-from src.mail_manager import MailManager
+---
 
-mailer = MailManager("your_email@gmail.com", "your_app_password")
-mailer.send_email_with_zip(
-    receiver_email="target@gmail.com",
-    subject="Scraped Data",
-    body="Attached is the zipped content.",
-    zip_file_path="my_scraped_data.zip"
-)
+## 🇻🇳 Tiếng Việt
+
+Một framework cào dữ liệu web mạnh mẽ được xây dựng bằng Python 3.11+, tối ưu hóa cho việc trích xuất nội dung truyện chữ, vượt qua các hệ thống chống bot và tự động đóng gói tài liệu bằng Docker.
+
+### ✨ Các Tính năng Chính
+- **Kiến trúc Docker-First**: Chạy crawler ở bất kỳ đâu mà không cần cài đặt Python hay Chrome trên máy thật.
+- **Đa luồng (Multithreading)**: Tăng tốc độ cào dữ liệu bằng `ThreadPoolExecutor`.
+- **Vượt rào cản Bot**: Sử dụng `SeleniumBase` (UC Mode) và `curl-cffi` để vượt qua Cloudflare.
+- **Quản lý Mật khẩu Linh hoạt**: Quản lý mật khẩu truyện tập trung qua các file JSON trong thư mục `passwords/`.
+- **Xuất dữ liệu lên Cloud**: Tự động nén zip và upload kết quả lên **Google Drive**.
+
+### 📁 Cấu trúc Project
+- `src/`: Chứa logic cốt lõi và các công cụ tự động hóa.
+- `docker_test/`: Các script được tối ưu cho Docker, hỗ trợ truyền tham số dòng lệnh.
+- `newtest/`: Các script gốc dùng để chạy trên máy cá nhân (Local).
+- `passwords/`: Nơi quản lý mật khẩu tập trung dưới dạng JSON.
+
+### 🛠️ Hướng dẫn Chạy (Docker)
+1. Chuẩn bị file `.env` chứa tài khoản đăng nhập (biến `SCRAPE_USER` và `SCRAPE_PASS`).
+2. Chạy qua Docker Compose:
+```bash
+docker compose -f docker_test_compose.yml up --build
 ```
-
-## 🤖 AI Context & Coding Standards (Mandatory)
-- **Package Manager**: Use `uv` (e.g., `uv add <package>`).
-- **Coding Style**: PEP 8, `snake_case` for functions/variables, `PascalCase` for classes.
-- **Type Hinting**: Required for all function parameters and return values.
-- **Documentation**: Every class/method MUST have a Docstring.
-- **Wait Strategy**: Avoid `time.sleep()`; use `WebDriverWait` with `expected_conditions`.
-- **Resource Management**: Use context managers or `try...finally` to ensure `driver.quit()`.
-- **Bypass Rule**: If a site has Cloudflare, use `Base(use_seleniumbase=True)` and `go_to_webpage(url, bypass_cloudflare=True)`.
+3. Để đổi truyện cần crawl, hãy sửa phần `command` trong file `docker_test_compose.yml` với các tham số `--url`, `--name`, và `--pass-file`.

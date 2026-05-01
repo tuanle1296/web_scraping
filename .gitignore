@@ -7,3 +7,9 @@ venv/
 credentials.json
 token.json
 config.json
+
+# Environment and Password files
+.env
+passwords/
+docker_test_compose.yml
+downloaded_files/

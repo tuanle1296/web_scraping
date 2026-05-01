@@ -33,9 +33,13 @@ class wordpress:
     normal_chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
     a_tag : tuple[By, str] = (By.TAG_NAME, "a")
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.entry-title")
+    chapter_title_2 : tuple[By, str] = (By.CSS_SELECTOR, "h2.wp-block-post-title")
     chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.entry-content")
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[name='post_password']")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "input[name='Submit']")
+    link_after_enter_password : tuple[By, str] = (By.CSS_SELECTOR, "p em")
+    google_drive_password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input[type='password']")
+    google_drive_password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button[aria-label='Submit']")
 
 @dataclass
 class trichtinhlau:
@@ -45,3 +49,11 @@ class trichtinhlau:
     chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "li.name-breadcum")
     password_input_field : tuple[By, str] = (By.CSS_SELECTOR, "input#passwordInput")
     password_submit_btn : tuple[By, str] = (By.CSS_SELECTOR, "button[type='submit']")
+
+@dataclass
+class vuaduongotp:
+    chapter_tab : tuple[By, str] = (By.CSS_SELECTOR, "a[href='#tab-chaptter']")
+    chap_list : tuple[By, str] = (By.CSS_SELECTOR, "div.list_chapter")
+    a_tag : tuple[By, str] = (By.TAG_NAME, "a")
+    chapter_content : tuple[By, str] = (By.CSS_SELECTOR, "div.post_single_desc")
+    chapter_title : tuple[By, str] = (By.CSS_SELECTOR, "h1.post_single_title")
