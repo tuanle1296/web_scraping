@@ -2,18 +2,36 @@ import sys
 import os
 import concurrent.futures
 import math
+from bs4 import BeautifulSoup
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from selenium.webdriver.common.by import By
 from src.base_functions import *
 from src.file_manager import get_config_folder_id
 from src.newlocators import wordpress as lo
 from src.drive_manager import DriveManager
 
 
-storyName = "ve_sau_mua_ha_lang_nghe_tuyet_tan"
-main_url = "https://cloudythewhale.wordpress.com/523-2/"
-forbidden_words = ["facebook", "onebook", "ngoai-le"]
+storyName = "soi_toi_roi"
+main_url = "https://maymay1510.wordpress.com/2018/03/08/soi-toi-roi-2/"
+forbidden_words = ["blog"]
+forbidden_texts = "password"
+
+# Define passwords dictionary based on ranges
 passwords_dict = {}
+# 21-30: "ChuDinh"
+# for i in range(21, 31): passwords_dict[str(i)] = "ChuDinh"
+# # 31-40: "LyHaDuong"
+# for i in range(31, 41): passwords_dict[str(i)] = "LyHaDuong"
+# # 41-50: "2308"
+# for i in range(41, 51): passwords_dict[str(i)] = "2308"
+# # 51-60: "VoGioi"
+# for i in range(51, 61): passwords_dict[str(i)] = "VoGioi"
+# # 61-76: "L"
+# for i in range(61, 77): passwords_dict[str(i)] = "L"
+# # 77-88: "25042026"
+# for i in range(77, 89): passwords_dict[str(i)] = "25042026"
+
 passwords_string = ""
 
 
@@ -28,8 +46,8 @@ def crawl_worker(chapter_data, folder_name):
         except Exception as e:
             print(f"Error while setting folder path: {e}")
         
-        try:
-            for chap_url, chap_num in chapter_data:
+        for chap_url, chap_num in chapter_data:
+            try:
                 print(f"Crawling: {chap_url}")
                 
                 crawl.go_to_webpage(chap_url)
@@ -38,28 +56,41 @@ def crawl_worker(chapter_data, folder_name):
                     print(f"Page {chap_url} did not load correctly. Skipping.")
                     continue
 
+                password = ""
                 if crawl.is_element_visible(lo.password_input_field):
                     print(f"Password field found for Chap {chap_num}. Trying passwords...")
                     
-                    if (passwords_dict) and (passwords_string is None):
-                        password = ""
+                    if passwords_dict and not passwords_string:
                         for key, value in passwords_dict.items():
                             if str(chap_num) == key:
                                 password = value
-                    elif (not passwords_dict) and (passwords_string is not None):
+                    elif not passwords_dict and passwords_string:
                         password = passwords_string
 
+                    if password:
                         crawl.input_text(lo.password_input_field, password)
                         crawl.click_element(lo.password_submit_btn)
-                        if (crawl.wait_for_element_visible(lo.chapter_content), 5):
+                        
+                        if crawl.wait_for_element_visible(lo.chapter_content, 5):
                             print(f"Password \"{password}\" for Chap \"{chap_num}\" is correct.") 
+                        
+                        # Check for Google Drive link after entering password
+                        if crawl.wait_for_element_visible(lo.link_after_enter_password, 5):
+                            if (crawl.get_element_text(lo.link_after_enter_password) == "Nhấp vào dòng này để đọc truyện"):
+                                print(f"Chapter \"{chap_num}\" need to go to drive to download manually. Skipping...")
+                                continue
+                    else:
+                        print(f"No password found for Chap {chap_num}. Skipping password field.")
 
                 title = crawl.get_element_text(lo.chapter_title)
+                if (title == ""):
+                    title = crawl.get_element_text(lo.chapter_title_2)
                 content = crawl.get_element_text(lo.chapter_content)
+
                 crawl.add_text_to_doc_file(title, content, "chapter_" + str(chap_num))
             
-        except Exception as e:
-            print(f"Error crawling {chap_url}: {e}")
+            except Exception as e:
+                print(f"Error crawling {chap_url}: {e}")
 
 
 def main(folder_name):
@@ -93,7 +124,8 @@ def main(folder_name):
         for p in entry_content_ps:
             for anchor in p.find_all(lo.a_tag[1]):
                 url = anchor.get('href')
-                if url and not any(word in url for word in forbidden_words) and (url not in chapters_list):
+                anchor_text = anchor.get_text()
+                if url and not any(word in url for word in forbidden_words) and (url not in chapters_list) and (forbidden_texts not in anchor_text):
                     chapters_list.append(url)
         
         # 2. If no chapters found, try finding anchors in normal_chap_list
@@ -104,7 +136,8 @@ def main(folder_name):
             if entry_content:
                 for anchor in entry_content.find_all(lo.a_tag[1]):
                     url = anchor.get('href')
-                    if url and not any(word in url for word in forbidden_words) and (url not in chapters_list):
+                    anchor_text = anchor.get_text()
+                    if url and not any(word in url for word in forbidden_words) and (url not in chapters_list) and (forbidden_texts not in anchor_text):
                         chapters_list.append(url)
 
     if not chapters_list:

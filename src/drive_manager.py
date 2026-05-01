@@ -2,6 +2,7 @@ import os.path
 from typing import Optional
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -34,8 +35,13 @@ class DriveManager:
         
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
+                try:
+                    creds.refresh(Request())
+                except RefreshError:
+                    print("Token refresh failed. Re-authenticating...")
+                    creds = None
+            
+            if not creds or not creds.valid:
                 if not os.path.exists(self.credentials_path):
                     raise FileNotFoundError(
                         f"'{self.credentials_path}' not found. Please download it from "
