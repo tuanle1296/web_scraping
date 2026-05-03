@@ -11,8 +11,8 @@ from src.newlocators import mongtruyen as lo
 from src.drive_manager import DriveManager
 
 
-storyName = "thuy_tinh"
-main_url = "https://mongtruyen.com/thuy-tinh-pha-le.html"
+storyName = "mat_ca_va_chau_ngoc"
+main_url = "https://mongtruyen.com/mat-ca-va-chau-ngoc.html"
 login_url = "https://mongtruyen.com/dang-nhap.html"
 username = "tuantest"
 password_signin = "04121996"
@@ -74,7 +74,8 @@ def crawl_worker(chapter_data, folder_name):
                         crawl.input_text(lo.password_input_field, password)
                         crawl.click_element(lo.password_submit_btn)
                         if (crawl.wait_for_element_visible(lo.chapter_content), 5):
-                            print(f"Password \"{password}\" for Chap \"{chap_num}\" is correct.") 
+                            print(f"Password \"{password}\" for Chap \"{chap_num}\" is correct.")
+                    crawl.sleep(3)
 
                 title = crawl.get_element_text(lo.chapter_title)
                 content = crawl.get_element_text(lo.chapter_content)
@@ -138,7 +139,7 @@ def main(folder_name):
         indexed_chapters.append((url, i + 1))
 
     # Split into chunks for parallel processing
-    num_threads = 3  # Adjust number of threads as needed
+    num_threads = 5  # Adjust number of threads as needed
     chunk_size = math.ceil(len(indexed_chapters) / num_threads)
     chunks = [indexed_chapters[i:i + chunk_size] for i in range(0, len(indexed_chapters), chunk_size)]
 
